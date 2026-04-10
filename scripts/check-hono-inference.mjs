@@ -438,6 +438,7 @@ function main() {
                 {
                     cwd: repoRoot,
                     encoding: 'utf8',
+                    shell: true,
                 }
             );
 

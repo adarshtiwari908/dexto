@@ -39,7 +39,7 @@ export interface ToolFactoryMetadata {
  */
 export interface ToolFactory<TConfig = unknown> {
     /** Zod schema for validating factory-specific configuration. */
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     /** Create one or more tool instances from validated config. */
     create(config: TConfig): Tool[];
     metadata?: ToolFactoryMetadata;
@@ -51,19 +51,19 @@ export interface ToolFactory<TConfig = unknown> {
  * Factories may return a Promise to support lazy optional dependencies (e.g., sqlite/pg/redis).
  */
 export interface BlobStoreFactory<TConfig = unknown> {
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     create(config: TConfig, logger: Logger): BlobStore | Promise<BlobStore>;
     metadata?: Record<string, unknown> | undefined;
 }
 
 export interface DatabaseFactory<TConfig = unknown> {
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     create(config: TConfig, logger: Logger): Database | Promise<Database>;
     metadata?: Record<string, unknown> | undefined;
 }
 
 export interface CacheFactory<TConfig = unknown> {
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     create(config: TConfig, logger: Logger): Cache | Promise<Cache>;
     metadata?: Record<string, unknown> | undefined;
 }
@@ -72,7 +72,7 @@ export interface CacheFactory<TConfig = unknown> {
  * Hook factories are keyed by `type` in the agent config (`hooks: [{ type: "..." }]`).
  */
 export interface HookFactory<TConfig = unknown> {
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     create(config: TConfig): Hook;
     metadata?: Record<string, unknown> | undefined;
 }
@@ -81,7 +81,7 @@ export interface HookFactory<TConfig = unknown> {
  * Compaction factories are keyed by `type` in the agent config (`compaction.type`).
  */
 export interface CompactionFactory<TConfig = unknown> {
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     create(config: TConfig): CompactionStrategy | Promise<CompactionStrategy>;
     metadata?: Record<string, unknown> | undefined;
 }
@@ -92,7 +92,7 @@ export interface CompactionFactory<TConfig = unknown> {
  * This remains a factory (vs a map) because an agent should have a single logger implementation.
  */
 export interface LoggerFactory<TConfig = unknown> {
-    configSchema: z.ZodType<TConfig, z.ZodTypeDef, unknown>;
+    configSchema: z.ZodType<TConfig>;
     create(config: TConfig): Logger;
     metadata?: Record<string, unknown> | undefined;
 }

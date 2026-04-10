@@ -204,13 +204,18 @@ export const GlobalPreferencesSchema = z.strictObject({
 
     defaults: PreferenceDefaultsSchema.describe('Default behavior preferences (required)'),
 
-    setup: PreferenceSetupSchema.default({ completed: false }).describe(
-        'Setup completion tracking'
-    ),
+    setup: PreferenceSetupSchema.default({
+        completed: false,
+        apiKeyPending: false,
+        baseURLPending: false,
+    }).describe('Setup completion tracking'),
 
-    sounds: PreferenceSoundsSchema.default({}).describe(
-        'Sound notification preferences (defaults applied for legacy preferences)'
-    ),
+    sounds: PreferenceSoundsSchema.default({
+        enabled: true,
+        onStartup: false,
+        onApprovalRequired: true,
+        onTaskComplete: true,
+    }).describe('Sound notification preferences (defaults applied for legacy preferences)'),
 });
 
 // Output types

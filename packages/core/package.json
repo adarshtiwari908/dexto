@@ -50,6 +50,9 @@
         "zod-to-json-schema": "^3.25.2"
     },
     "devDependencies": {
+        "@opentelemetry/core": "^1.28.0",
+        "@opentelemetry/exporter-trace-otlp-grpc": "^0.55.0",
+        "@opentelemetry/exporter-trace-otlp-http": "^0.55.0",
         "@opentelemetry/instrumentation-http": "^0.210.0",
         "@opentelemetry/instrumentation-undici": "^0.20.0",
         "@opentelemetry/resources": "^1.28.0",

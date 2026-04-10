@@ -11,8 +11,9 @@ import {
     SystemPromptConfigSchema,
     PermissionsConfigSchema,
     ResourcesConfigSchema,
+    type ValidatedServersConfig,
 } from '@dexto/core';
-import { StorageSchema } from '@dexto/storage/schemas';
+import { StorageSchema, type ValidatedStorageConfig } from '@dexto/storage/schemas';
 import { z } from 'zod';
 import { HooksConfigSchema } from './hooks.js';
 import { CompactionConfigSchema, DEFAULT_COMPACTION_CONFIG } from './compaction.js';
@@ -90,7 +91,7 @@ export function createAgentConfigSchema() {
                             'Whether to discover AGENTS.md/CLAUDE.md/GEMINI.md in the current working directory and include it in the system prompt'
                         ),
                 })
-                .default({})
+                .default({ discoverInCwd: true })
                 .describe('Agent instruction file discovery configuration'),
 
             image: z
@@ -112,7 +113,7 @@ export function createAgentConfigSchema() {
 
             mcpServers: McpServersConfigSchema.describe(
                 'Configurations for MCP (Model Context Protocol) servers used by the agent'
-            ).default({}),
+            ).default({} as ValidatedServersConfig),
 
             tools: z
                 .array(ToolFactoryEntrySchema)
@@ -134,15 +135,22 @@ export function createAgentConfigSchema() {
                 cache: { type: 'in-memory' },
                 database: { type: 'in-memory' },
                 blob: { type: 'in-memory' },
-            }),
+            } as ValidatedStorageConfig),
 
-            sessions: SessionConfigSchema.describe('Session management configuration').default({}),
+            sessions: SessionConfigSchema.describe('Session management configuration').default({
+                maxSessions: 100,
+                sessionTTL: 3600000,
+            }),
 
             permissions: PermissionsConfigSchema.describe(
                 'Tool permissions and approval configuration'
-            ).default({}),
+            ).default({
+                mode: 'auto-approve',
+                allowedToolsStorage: 'storage',
+                toolPolicies: { alwaysAllow: [], alwaysDeny: [] },
+            }),
 
-            elicitation: ElicitationConfigSchema.default({}).describe(
+            elicitation: ElicitationConfigSchema.default({ enabled: false }).describe(
                 'Elicitation configuration for user input requests (ask_user tool and MCP server elicitations). Independent from permissions mode.'
             ),
 

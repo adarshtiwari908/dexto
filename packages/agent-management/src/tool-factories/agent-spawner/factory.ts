@@ -19,6 +19,7 @@ import {
     AgentSpawnerConfigSchema,
     SpawnAgentInputSchema,
     type AgentSpawnerConfig,
+    type SpawnAgentInput,
 } from './schemas.js';
 import { AgentSpawnerRuntime } from './runtime.js';
 import { createSpawnAgentTool } from './spawn-agent-tool.js';
@@ -316,10 +317,10 @@ export const agentSpawnerToolsFactory: ToolFactory<AgentSpawnerConfig> = {
                     return tool.description;
                 },
                 inputSchema: SpawnAgentInputSchema,
-                execute: (input, context) =>
+                execute: (input: SpawnAgentInput, context) =>
                     ensureToolsInitialized(context).spawnAgent.execute(input, context),
                 presentation: {
-                    describeHeader: (input) => {
+                    describeHeader: (input: SpawnAgentInput) => {
                         const agentId =
                             typeof input.agentId === 'string' ? input.agentId : undefined;
                         const agentLabel = agentId ? agentId.replace(/-agent$/, '') : undefined;
@@ -335,7 +336,7 @@ export const agentSpawnerToolsFactory: ToolFactory<AgentSpawnerConfig> = {
                             ...(argsText ? { argsText } : {}),
                         });
                     },
-                    preview: async (input, context) => {
+                    preview: async (input: SpawnAgentInput, context) => {
                         const tool = ensureToolsInitialized(context).spawnAgent;
                         const previewFn = tool.presentation?.preview;
                         if (!previewFn) {
@@ -349,7 +350,7 @@ export const agentSpawnerToolsFactory: ToolFactory<AgentSpawnerConfig> = {
                 id: 'wait_for',
                 description: 'Wait for background task(s) to complete.',
                 inputSchema: WaitForInputSchema,
-                execute: (input, context) =>
+                execute: (input: WaitForInput, context) =>
                     ensureToolsInitialized(context).waitFor.execute(input, context),
                 presentation: {
                     describeHeader: (input: WaitForInput) => {
@@ -364,7 +365,7 @@ export const agentSpawnerToolsFactory: ToolFactory<AgentSpawnerConfig> = {
                             ...(argsText ? { argsText } : {}),
                         });
                     },
-                    preview: async (input, context) => {
+                    preview: async (input: WaitForInput, context) => {
                         const tool = ensureToolsInitialized(context).waitFor;
                         const previewFn = tool.presentation?.preview;
                         if (!previewFn) {
@@ -378,7 +379,7 @@ export const agentSpawnerToolsFactory: ToolFactory<AgentSpawnerConfig> = {
                 id: 'check_task',
                 description: 'Check the status of a background task.',
                 inputSchema: CheckTaskInputSchema,
-                execute: (input, context) =>
+                execute: (input: CheckTaskInput, context) =>
                     ensureToolsInitialized(context).checkTask.execute(input, context),
                 presentation: {
                     describeHeader: (input: CheckTaskInput) => {
@@ -389,7 +390,7 @@ export const agentSpawnerToolsFactory: ToolFactory<AgentSpawnerConfig> = {
                             ...(argsText ? { argsText } : {}),
                         });
                     },
-                    preview: async (input, context) => {
+                    preview: async (input: CheckTaskInput, context) => {
                         const tool = ensureToolsInitialized(context).checkTask;
                         const previewFn = tool.presentation?.preview;
                         if (!previewFn) {

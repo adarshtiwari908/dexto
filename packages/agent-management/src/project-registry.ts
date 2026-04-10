@@ -14,7 +14,7 @@ export const ProjectRegistryEntrySchema = z
         tags: z.array(NonEmptyStringSchema).optional(),
         parentAgentId: NonEmptyStringSchema.optional(),
     })
-    .describe(NonEmptyStringSchema);
+    .describe('Project registry entry');
 
 export type ProjectRegistryEntry = z.output<typeof ProjectRegistryEntrySchema>;
 
