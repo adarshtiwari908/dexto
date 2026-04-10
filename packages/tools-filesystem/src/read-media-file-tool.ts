@@ -10,14 +10,12 @@ import type { FileDisplayData, Tool, ToolExecutionContext } from '@dexto/core';
 import type { FileSystemServiceGetter } from './file-tool-types.js';
 import { createDirectoryAccessApprovalHandlers, resolveFilePath } from './directory-approval.js';
 
-const ReadMediaFileInputSchema = z
-    .object({
-        file_path: z
-            .string()
-            .min(1)
-            .describe('Absolute path to the image, audio, video, PDF, or binary file to read'),
-    })
-    .strict();
+const ReadMediaFileInputSchema = z.strictObject({
+    file_path: z
+        .string()
+        .min(1)
+        .describe('Absolute path to the image, audio, video, PDF, or binary file to read'),
+});
 
 export function createReadMediaFileTool(
     getFileSystemService: FileSystemServiceGetter

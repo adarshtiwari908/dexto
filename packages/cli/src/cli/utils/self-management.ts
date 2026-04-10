@@ -13,19 +13,17 @@ const DEFAULT_WINDOWS_INSTALL_URL = 'https://dexto.ai/install.ps1';
 export type InstallMethod = 'native' | 'npm' | 'project-local' | 'unknown';
 export type UnsupportedPackageManager = 'pnpm' | 'bun';
 
-const InstallMetadataSchema = z
-    .object({
-        schemaVersion: z.number().int().positive().default(1),
-        method: z.enum(['native', 'npm']),
-        installedPath: z.string().min(1),
-        installedAt: z.string().min(1),
-        version: z.string().min(1),
-        sourceUrl: z.string().min(1).optional(),
-        releaseTag: z.string().min(1).optional(),
-        platform: z.string().min(1).optional(),
-        arch: z.string().min(1).optional(),
-    })
-    .strict();
+const InstallMetadataSchema = z.strictObject({
+    schemaVersion: z.int().positive().default(1),
+    method: z.enum(['native', 'npm']),
+    installedPath: z.string().min(1),
+    installedAt: z.string().min(1),
+    version: z.string().min(1),
+    sourceUrl: z.string().min(1).optional(),
+    releaseTag: z.string().min(1).optional(),
+    platform: z.string().min(1).optional(),
+    arch: z.string().min(1).optional(),
+});
 
 export type InstallMetadata = z.output<typeof InstallMetadataSchema>;
 

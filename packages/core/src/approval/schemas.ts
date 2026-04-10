@@ -10,7 +10,7 @@ import { isValidDisplayData } from '../tools/display-types.js';
 import type { ToolPresentationSnapshotV1 } from '../tools/types.js';
 
 // Zod schema that validates as object but types as JSONSchema7
-const JsonSchema7Schema = z.record(z.unknown()) as z.ZodType<JSONSchema7>;
+const JsonSchema7Schema = z.record(z.string(), z.unknown()) as z.ZodType<JSONSchema7>;
 
 /**
  * Schema for approval types
@@ -29,14 +29,14 @@ export const DenialReasonSchema = z.enum(DENIAL_REASONS);
 
 // Custom Zod schema for ToolDisplayData validation
 const ToolDisplayDataSchema = z.custom<ToolDisplayData>((val) => isValidDisplayData(val), {
-    message: 'Invalid ToolDisplayData',
+    error: 'Invalid ToolDisplayData',
 });
 
 const ToolPresentationSnapshotV1Schema = z.custom<ToolPresentationSnapshotV1>(
     (val) =>
         typeof val === 'object' && val !== null && (val as { version?: unknown }).version === 1,
     {
-        message: 'Invalid ToolPresentationSnapshotV1',
+        error: 'Invalid ToolPresentationSnapshotV1',
     }
 );
 
@@ -45,26 +45,25 @@ const ToolPresentationSnapshotV1Schema = z.custom<ToolPresentationSnapshotV1>(
  * Used when a tool tries to access files outside the working directory
  */
 export const DirectoryAccessMetadataSchema = z
-    .object({
+    .strictObject({
         path: z.string().describe('Full path being accessed'),
         parentDir: z.string().describe('Parent directory (what gets approved for session)'),
         operation: z.enum(['read', 'write', 'edit']).describe('Type of file operation'),
         toolName: z.string().describe('Name of the tool requesting access'),
     })
-    .strict()
     .describe('Directory access metadata');
 
 /**
  * Tool approval metadata schema
  */
 export const ToolApprovalMetadataSchema = z
-    .object({
+    .strictObject({
         toolName: z.string().describe('Name of the tool to confirm'),
         presentationSnapshot: ToolPresentationSnapshotV1Schema.optional().describe(
             'Optional UI-agnostic presentation snapshot for the tool call. Clients MUST ignore unknown fields.'
         ),
         toolCallId: z.string().describe('Unique tool call ID for tracking parallel tool calls'),
-        args: z.record(z.unknown()).describe('Arguments for the tool'),
+        args: z.record(z.string(), z.unknown()).describe('Arguments for the tool'),
         description: z.string().optional().describe('Description of the tool'),
         displayPreview: ToolDisplayDataSchema.optional().describe(
             'Preview display data for approval UI (e.g., diff preview)'
@@ -80,7 +79,6 @@ export const ToolApprovalMetadataSchema = z
                     'Tools may provide patterns to allow approving a broader subset of future calls (e.g., ["git push *", "git *"]).'
             ),
     })
-    .strict()
     .describe('Tool approval metadata');
 
 /**
@@ -88,7 +86,7 @@ export const ToolApprovalMetadataSchema = z
  * TODO: Consider combining this with regular tools schemas for consistency
  */
 export const CommandConfirmationMetadataSchema = z
-    .object({
+    .strictObject({
         toolName: z.string().describe('Name of the tool executing the command'),
         command: z.string().describe('The normalized command to execute'),
         originalCommand: z
@@ -96,37 +94,36 @@ export const CommandConfirmationMetadataSchema = z
             .optional()
             .describe('The original command before normalization'),
     })
-    .strict()
     .describe('Command confirmation metadata');
 
 /**
  * Elicitation metadata schema
  */
 export const ElicitationMetadataSchema = z
-    .object({
+    .strictObject({
         schema: JsonSchema7Schema.describe('JSON Schema for the form'),
         prompt: z.string().describe('High-level prompt/context for the form (clients may show it)'),
         serverName: z.string().describe('MCP server requesting input'),
-        context: z.record(z.unknown()).optional().describe('Additional context'),
+        context: z.record(z.string(), z.unknown()).optional().describe('Additional context'),
     })
-    .strict()
     .describe('Elicitation metadata');
 
 /**
  * Custom approval metadata schema - flexible
  */
-export const CustomApprovalMetadataSchema = z.record(z.unknown()).describe('Custom metadata');
+export const CustomApprovalMetadataSchema = z
+    .record(z.string(), z.unknown())
+    .describe('Custom metadata');
 
 /**
  * Base approval request schema
  */
 export const BaseApprovalRequestSchema = z
     .object({
-        approvalId: z.string().uuid().describe('Unique approval identifier'),
+        approvalId: z.uuid().describe('Unique approval identifier'),
         type: ApprovalTypeSchema.describe('Type of approval'),
         sessionId: z.string().optional().describe('Session identifier'),
         timeout: z
-            .number()
             .int()
             .positive()
             .optional()
@@ -138,42 +135,52 @@ export const BaseApprovalRequestSchema = z
 /**
  * Tool approval request schema
  */
-export const ToolApprovalRequestSchema = BaseApprovalRequestSchema.extend({
-    type: z.literal(ApprovalType.TOOL_APPROVAL),
-    metadata: ToolApprovalMetadataSchema,
-}).strict();
+export const ToolApprovalRequestSchema = z.strictObject(
+    BaseApprovalRequestSchema.extend({
+        type: z.literal(ApprovalType.TOOL_APPROVAL),
+        metadata: ToolApprovalMetadataSchema,
+    }).shape
+);
 
 /**
  * Command confirmation request schema
  */
-export const CommandConfirmationRequestSchema = BaseApprovalRequestSchema.extend({
-    type: z.literal(ApprovalType.COMMAND_CONFIRMATION),
-    metadata: CommandConfirmationMetadataSchema,
-}).strict();
+export const CommandConfirmationRequestSchema = z.strictObject(
+    BaseApprovalRequestSchema.extend({
+        type: z.literal(ApprovalType.COMMAND_CONFIRMATION),
+        metadata: CommandConfirmationMetadataSchema,
+    }).shape
+);
 
 /**
  * Elicitation request schema
  */
-export const ElicitationRequestSchema = BaseApprovalRequestSchema.extend({
-    type: z.literal(ApprovalType.ELICITATION),
-    metadata: ElicitationMetadataSchema,
-}).strict();
+export const ElicitationRequestSchema = z.strictObject(
+    BaseApprovalRequestSchema.extend({
+        type: z.literal(ApprovalType.ELICITATION),
+        metadata: ElicitationMetadataSchema,
+    }).shape
+);
 
 /**
  * Custom approval request schema
  */
-export const CustomApprovalRequestSchema = BaseApprovalRequestSchema.extend({
-    type: z.literal(ApprovalType.CUSTOM),
-    metadata: CustomApprovalMetadataSchema,
-}).strict();
+export const CustomApprovalRequestSchema = z.strictObject(
+    BaseApprovalRequestSchema.extend({
+        type: z.literal(ApprovalType.CUSTOM),
+        metadata: CustomApprovalMetadataSchema,
+    }).shape
+);
 
 /**
  * Directory access request schema
  */
-export const DirectoryAccessRequestSchema = BaseApprovalRequestSchema.extend({
-    type: z.literal(ApprovalType.DIRECTORY_ACCESS),
-    metadata: DirectoryAccessMetadataSchema,
-}).strict();
+export const DirectoryAccessRequestSchema = z.strictObject(
+    BaseApprovalRequestSchema.extend({
+        type: z.literal(ApprovalType.DIRECTORY_ACCESS),
+        metadata: DirectoryAccessMetadataSchema,
+    }).shape
+);
 
 /**
  * Discriminated union for all approval requests
@@ -190,7 +197,7 @@ export const ApprovalRequestSchema = z.discriminatedUnion('type', [
  * Tool approval response data schema
  */
 export const ToolApprovalResponseDataSchema = z
-    .object({
+    .strictObject({
         rememberChoice: z
             .boolean()
             .optional()
@@ -209,48 +216,44 @@ export const ToolApprovalResponseDataSchema = z
                 'Remember this directory for the session (allows future access without prompting again)'
             ),
     })
-    .strict()
     .describe('Tool approval response data');
 
 /**
  * Command confirmation response data schema
  */
 export const CommandConfirmationResponseDataSchema = z
-    .object({
+    .strictObject({
         // Command confirmations don't have remember choice - they're per-command
         // Could add command pattern remembering in future (e.g., "remember git push *")
     })
-    .strict()
     .describe('Command confirmation response data');
 
 /**
  * Elicitation response data schema
  */
 export const ElicitationResponseDataSchema = z
-    .object({
-        formData: z.record(z.unknown()).describe('Form data matching schema'),
+    .strictObject({
+        formData: z.record(z.string(), z.unknown()).describe('Form data matching schema'),
     })
-    .strict()
     .describe('Elicitation response data');
 
 /**
  * Custom approval response data schema
  */
 export const CustomApprovalResponseDataSchema = z
-    .record(z.unknown())
+    .record(z.string(), z.unknown())
     .describe('Custom response data');
 
 /**
  * Directory access response data schema
  */
 export const DirectoryAccessResponseDataSchema = z
-    .object({
+    .strictObject({
         rememberDirectory: z
             .boolean()
             .optional()
             .describe('Remember this directory for the session (allows all file access within it)'),
     })
-    .strict()
     .describe('Directory access response data');
 
 /**
@@ -258,7 +261,7 @@ export const DirectoryAccessResponseDataSchema = z
  */
 export const BaseApprovalResponseSchema = z
     .object({
-        approvalId: z.string().uuid().describe('Must match request approvalId'),
+        approvalId: z.uuid().describe('Must match request approvalId'),
         status: ApprovalStatusSchema.describe('Approval status'),
         sessionId: z.string().optional().describe('Session identifier'),
         reason: DenialReasonSchema.optional().describe(
@@ -269,7 +272,6 @@ export const BaseApprovalResponseSchema = z
             .optional()
             .describe('Human-readable message explaining the denial/cancellation'),
         timeoutMs: z
-            .number()
             .int()
             .positive()
             .optional()
@@ -280,37 +282,47 @@ export const BaseApprovalResponseSchema = z
 /**
  * Tool approval response schema
  */
-export const ToolApprovalResponseSchema = BaseApprovalResponseSchema.extend({
-    data: ToolApprovalResponseDataSchema.optional(),
-}).strict();
+export const ToolApprovalResponseSchema = z.strictObject(
+    BaseApprovalResponseSchema.extend({
+        data: ToolApprovalResponseDataSchema.optional(),
+    }).shape
+);
 
 /**
  * Command confirmation response schema
  */
-export const CommandConfirmationResponseSchema = BaseApprovalResponseSchema.extend({
-    data: CommandConfirmationResponseDataSchema.optional(),
-}).strict();
+export const CommandConfirmationResponseSchema = z.strictObject(
+    BaseApprovalResponseSchema.extend({
+        data: CommandConfirmationResponseDataSchema.optional(),
+    }).shape
+);
 
 /**
  * Elicitation response schema
  */
-export const ElicitationResponseSchema = BaseApprovalResponseSchema.extend({
-    data: ElicitationResponseDataSchema.optional(),
-}).strict();
+export const ElicitationResponseSchema = z.strictObject(
+    BaseApprovalResponseSchema.extend({
+        data: ElicitationResponseDataSchema.optional(),
+    }).shape
+);
 
 /**
  * Custom approval response schema
  */
-export const CustomApprovalResponseSchema = BaseApprovalResponseSchema.extend({
-    data: CustomApprovalResponseDataSchema.optional(),
-}).strict();
+export const CustomApprovalResponseSchema = z.strictObject(
+    BaseApprovalResponseSchema.extend({
+        data: CustomApprovalResponseDataSchema.optional(),
+    }).shape
+);
 
 /**
  * Directory access response schema
  */
-export const DirectoryAccessResponseSchema = BaseApprovalResponseSchema.extend({
-    data: DirectoryAccessResponseDataSchema.optional(),
-}).strict();
+export const DirectoryAccessResponseSchema = z.strictObject(
+    BaseApprovalResponseSchema.extend({
+        data: DirectoryAccessResponseDataSchema.optional(),
+    }).shape
+);
 
 /**
  * Union of all approval responses
@@ -331,7 +343,6 @@ export const ApprovalRequestDetailsSchema = z
         type: ApprovalTypeSchema,
         sessionId: z.string().optional(),
         timeout: z
-            .number()
             .int()
             .positive()
             .optional()
@@ -350,7 +361,7 @@ export const ApprovalRequestDetailsSchema = z
             const result = ToolApprovalMetadataSchema.safeParse(data.metadata);
             if (!result.success) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     message:
                         'Metadata must match ToolApprovalMetadataSchema for TOOL_APPROVAL type',
                     path: ['metadata'],
@@ -360,7 +371,7 @@ export const ApprovalRequestDetailsSchema = z
             const result = CommandConfirmationMetadataSchema.safeParse(data.metadata);
             if (!result.success) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     message:
                         'Metadata must match CommandConfirmationMetadataSchema for COMMAND_CONFIRMATION type',
                     path: ['metadata'],
@@ -370,7 +381,7 @@ export const ApprovalRequestDetailsSchema = z
             const result = ElicitationMetadataSchema.safeParse(data.metadata);
             if (!result.success) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     message: 'Metadata must match ElicitationMetadataSchema for ELICITATION type',
                     path: ['metadata'],
                 });
@@ -379,7 +390,7 @@ export const ApprovalRequestDetailsSchema = z
             const result = DirectoryAccessMetadataSchema.safeParse(data.metadata);
             if (!result.success) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     message:
                         'Metadata must match DirectoryAccessMetadataSchema for DIRECTORY_ACCESS type',
                     path: ['metadata'],
@@ -389,7 +400,7 @@ export const ApprovalRequestDetailsSchema = z
             const result = CustomApprovalMetadataSchema.safeParse(data.metadata);
             if (!result.success) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     message: 'Metadata must match CustomApprovalMetadataSchema for CUSTOM type',
                     path: ['metadata'],
                 });

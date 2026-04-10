@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import type { z, ZodTypeAny } from 'zod';
+import type { z, ZodType } from 'zod';
 import { ApprovalStatus, ApprovalType, ToolError } from '@dexto/core';
 import type { ApprovalRequestDetails, ApprovalResponse, ToolExecutionContext } from '@dexto/core';
 import type { FileSystemService } from './filesystem-service.js';
@@ -22,7 +22,7 @@ export function resolveFilePath(
     return { path: resolvedPath, parentDir: path.dirname(resolvedPath) };
 }
 
-export function createDirectoryAccessApprovalHandlers<const TSchema extends ZodTypeAny>(options: {
+export function createDirectoryAccessApprovalHandlers<const TSchema extends ZodType>(options: {
     toolName: string;
     operation: DirectoryApprovalOperation;
     inputSchema: TSchema;

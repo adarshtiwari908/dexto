@@ -43,56 +43,50 @@ export const FILESYSTEM_TOOL_NAMES = [
  * Services receive fully-validated config from this schema and use it as-is,
  * with no additional defaults or fallbacks needed.
  */
-export const FileSystemToolsConfigSchema = z
-    .object({
-        type: z.literal('filesystem-tools'),
-        allowedPaths: z
-            .array(z.string())
-            .default(DEFAULT_ALLOWED_PATHS)
-            .describe('List of allowed base paths for file operations'),
-        blockedPaths: z
-            .array(z.string())
-            .default(DEFAULT_BLOCKED_PATHS)
-            .describe('List of blocked paths to exclude from operations'),
-        blockedExtensions: z
-            .array(z.string())
-            .default(DEFAULT_BLOCKED_EXTENSIONS)
-            .describe('List of blocked file extensions'),
-        maxFileSize: z
-            .number()
-            .int()
-            .positive()
-            .default(DEFAULT_MAX_FILE_SIZE)
-            .describe(
-                `Maximum file size in bytes (default: ${DEFAULT_MAX_FILE_SIZE / 1024 / 1024}MB)`
-            ),
-        workingDirectory: z
-            .string()
-            .optional()
-            .describe('Working directory for file operations (defaults to process.cwd())'),
-        enableBackups: z
-            .boolean()
-            .default(DEFAULT_ENABLE_BACKUPS)
-            .describe('Enable automatic backups of modified files'),
-        backupPath: z
-            .string()
-            .optional()
-            .describe('Absolute path for storing file backups (if enableBackups is true)'),
-        backupRetentionDays: z
-            .number()
-            .int()
-            .positive()
-            .default(DEFAULT_BACKUP_RETENTION_DAYS)
-            .describe(
-                `Number of days to retain backup files (default: ${DEFAULT_BACKUP_RETENTION_DAYS})`
-            ),
-        enabledTools: z
-            .array(z.enum(FILESYSTEM_TOOL_NAMES))
-            .optional()
-            .describe(
-                `Subset of tools to enable. If not specified, all tools are enabled. Available: ${FILESYSTEM_TOOL_NAMES.join(', ')}`
-            ),
-    })
-    .strict();
+export const FileSystemToolsConfigSchema = z.strictObject({
+    type: z.literal('filesystem-tools'),
+    allowedPaths: z
+        .array(z.string())
+        .default(DEFAULT_ALLOWED_PATHS)
+        .describe('List of allowed base paths for file operations'),
+    blockedPaths: z
+        .array(z.string())
+        .default(DEFAULT_BLOCKED_PATHS)
+        .describe('List of blocked paths to exclude from operations'),
+    blockedExtensions: z
+        .array(z.string())
+        .default(DEFAULT_BLOCKED_EXTENSIONS)
+        .describe('List of blocked file extensions'),
+    maxFileSize: z
+        .int()
+        .positive()
+        .default(DEFAULT_MAX_FILE_SIZE)
+        .describe(`Maximum file size in bytes (default: ${DEFAULT_MAX_FILE_SIZE / 1024 / 1024}MB)`),
+    workingDirectory: z
+        .string()
+        .optional()
+        .describe('Working directory for file operations (defaults to process.cwd())'),
+    enableBackups: z
+        .boolean()
+        .default(DEFAULT_ENABLE_BACKUPS)
+        .describe('Enable automatic backups of modified files'),
+    backupPath: z
+        .string()
+        .optional()
+        .describe('Absolute path for storing file backups (if enableBackups is true)'),
+    backupRetentionDays: z
+        .int()
+        .positive()
+        .default(DEFAULT_BACKUP_RETENTION_DAYS)
+        .describe(
+            `Number of days to retain backup files (default: ${DEFAULT_BACKUP_RETENTION_DAYS})`
+        ),
+    enabledTools: z
+        .array(z.enum(FILESYSTEM_TOOL_NAMES))
+        .optional()
+        .describe(
+            `Subset of tools to enable. If not specified, all tools are enabled. Available: ${FILESYSTEM_TOOL_NAMES.join(', ')}`
+        ),
+});
 
 export type FileSystemToolsConfig = z.output<typeof FileSystemToolsConfigSchema>;

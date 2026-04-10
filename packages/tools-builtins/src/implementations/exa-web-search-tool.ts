@@ -3,37 +3,33 @@ import { createLocalToolCallHeader, defineTool, truncateForHeader } from '@dexto
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 import { callExaTool } from './exa-mcp.js';
 
-const WebSearchInputSchema = z
-    .object({
-        query: z.string().min(1).describe('Web search query'),
-        numResults: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(8)
-            .describe('Number of results to return (default: 8)'),
-        livecrawl: z
-            .enum(['fallback', 'preferred'])
-            .optional()
-            .default('fallback')
-            .describe(
-                "Live crawl mode - 'fallback' uses cached content when available, 'preferred' prioritizes live crawling"
-            ),
-        type: z
-            .enum(['auto', 'fast'])
-            .optional()
-            .default('auto')
-            .describe("Search type - 'auto' (default) or 'fast'"),
-        contextMaxCharacters: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(10000)
-            .describe('Maximum context length in characters (default: 10000)'),
-    })
-    .strict();
+const WebSearchInputSchema = z.strictObject({
+    query: z.string().min(1).describe('Web search query'),
+    numResults: z
+        .int()
+        .positive()
+        .optional()
+        .default(8)
+        .describe('Number of results to return (default: 8)'),
+    livecrawl: z
+        .enum(['fallback', 'preferred'])
+        .optional()
+        .default('fallback')
+        .describe(
+            "Live crawl mode - 'fallback' uses cached content when available, 'preferred' prioritizes live crawling"
+        ),
+    type: z
+        .enum(['auto', 'fast'])
+        .optional()
+        .default('auto')
+        .describe("Search type - 'auto' (default) or 'fast'"),
+    contextMaxCharacters: z
+        .int()
+        .positive()
+        .optional()
+        .default(10000)
+        .describe('Maximum context length in characters (default: 10000)'),
+});
 /**
  * Create the `web_search` tool.
  *

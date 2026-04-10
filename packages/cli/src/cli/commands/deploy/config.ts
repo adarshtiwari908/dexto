@@ -42,50 +42,42 @@ const WorkspaceRelativePathSchema = z
             return normalizeWorkspaceRelativePath(value);
         } catch (error) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 message: error instanceof Error ? error.message : 'Invalid workspace-relative path',
             });
             return z.NEVER;
         }
     });
 
-const CloudDefaultDeployAgentSchema = z
-    .object({
-        type: z.literal('cloud-default'),
-    })
-    .strict();
+const CloudDefaultDeployAgentSchema = z.strictObject({
+    type: z.literal('cloud-default'),
+});
 
-const WorkspaceDeployAgentSchema = z
-    .object({
-        type: z.literal('workspace'),
-        path: WorkspaceRelativePathSchema.describe(
-            'Repo-relative path to the agent YAML that should boot in cloud'
-        ),
-    })
-    .strict();
+const WorkspaceDeployAgentSchema = z.strictObject({
+    type: z.literal('workspace'),
+    path: WorkspaceRelativePathSchema.describe(
+        'Repo-relative path to the agent YAML that should boot in cloud'
+    ),
+});
 
 export const DeployAgentSchema = z.discriminatedUnion('type', [
     CloudDefaultDeployAgentSchema,
     WorkspaceDeployAgentSchema,
 ]);
 
-export const DeployConfigSchema = z
-    .object({
-        version: z.literal(1).default(1),
-        agent: DeployAgentSchema,
-        exclude: z.array(z.string().trim().min(1)).default([...DEFAULT_DEPLOY_EXCLUDES]),
-    })
-    .strict();
+export const DeployConfigSchema = z.strictObject({
+    version: z.literal(1).default(1),
+    agent: DeployAgentSchema,
+    exclude: z.array(z.string().trim().min(1)).default([...DEFAULT_DEPLOY_EXCLUDES]),
+});
 
-const LegacyDeployConfigSchema = z
-    .object({
-        version: z.literal(1).default(1),
-        entryAgent: WorkspaceRelativePathSchema.describe(
-            'Repo-relative path to the agent YAML that should boot in cloud'
-        ),
-        exclude: z.array(z.string().trim().min(1)).default([...DEFAULT_DEPLOY_EXCLUDES]),
-    })
-    .strict();
+const LegacyDeployConfigSchema = z.strictObject({
+    version: z.literal(1).default(1),
+    entryAgent: WorkspaceRelativePathSchema.describe(
+        'Repo-relative path to the agent YAML that should boot in cloud'
+    ),
+    exclude: z.array(z.string().trim().min(1)).default([...DEFAULT_DEPLOY_EXCLUDES]),
+});
 
 export type DeployConfig = z.output<typeof DeployConfigSchema>;
 export type DeployConfigInput = z.input<typeof DeployConfigSchema>;

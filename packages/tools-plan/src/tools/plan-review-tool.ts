@@ -18,14 +18,12 @@ import type { Tool, ToolExecutionContext, FileDisplayData } from '@dexto/core';
 import type { PlanServiceGetter } from '../plan-service-getter.js';
 import { PlanError } from '../errors.js';
 
-const PlanReviewInputSchema = z
-    .object({
-        summary: z
-            .string()
-            .optional()
-            .describe('Brief summary of the plan for context (shown above the plan content)'),
-    })
-    .strict();
+const PlanReviewInputSchema = z.strictObject({
+    summary: z
+        .string()
+        .optional()
+        .describe('Brief summary of the plan for context (shown above the plan content)'),
+});
 
 /**
  * Creates the plan_review tool

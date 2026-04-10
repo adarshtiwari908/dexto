@@ -213,11 +213,9 @@ const DEFAULT_AGENT_TOOL_BUNDLE_IDS: AgentToolBundleId[] = ['workspace', 'planni
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PROMPT_GENERATOR_AGENT_ID = 'init-agent-prompt-generator';
 
-const GeneratedSystemPromptPayloadSchema = z
-    .object({
-        systemPrompt: z.string().trim().min(1),
-    })
-    .strict();
+const GeneratedSystemPromptPayloadSchema = z.strictObject({
+    systemPrompt: z.string().trim().min(1),
+});
 
 const AGENT_PROMPT_GENERATOR_SYSTEM_PROMPT = [
     'You design production-grade system prompts for Dexto agents.',

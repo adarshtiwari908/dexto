@@ -67,7 +67,7 @@ import type { CodexModelInfo, LLMProvider, ReasoningVariant } from '@dexto/core'
 
 // Zod schema for setup command validation
 const SetupCommandSchema = z
-    .object({
+    .strictObject({
         provider: z
             .enum(LLM_PROVIDERS)
             .optional()
@@ -96,7 +96,6 @@ const SetupCommandSchema = z
             .default(false)
             .describe('Use quick start with Google Gemini (recommended for new users)'),
     })
-    .strict()
     .superRefine((data, ctx) => {
         // Validate model against provider when both are provided
         if (data.provider && data.model) {
@@ -105,7 +104,7 @@ const SetupCommandSchema = z
                 if (!isValidProviderModel(data.provider, data.model)) {
                     const supportedModels = getSupportedModels(data.provider);
                     ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
+                        code: 'custom',
                         path: ['model'],
                         message: `Model '${data.model}' is not supported by provider '${data.provider}'. Supported models: ${supportedModels.join(', ')}`,
                     });

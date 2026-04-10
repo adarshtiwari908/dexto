@@ -34,11 +34,10 @@ const CommonCompactionFields = {
  * factory's `configSchema`.
  */
 export const CompactionConfigSchema = z
-    .object({
+    .looseObject({
         type: z.string().describe('Compaction strategy type'),
         ...CommonCompactionFields,
     })
-    .passthrough()
     .describe('Context compaction configuration');
 
 export type CompactionConfig = z.input<typeof CompactionConfigSchema>;
@@ -54,17 +53,15 @@ export const DEFAULT_COMPACTION_CONFIG: ValidatedCompactionConfig = {
 };
 
 export const ReactiveOverflowCompactionConfigSchema = z
-    .object({
+    .strictObject({
         type: z.literal('reactive-overflow'),
         ...CommonCompactionFields,
         preserveLastNTurns: z
-            .number()
             .int()
             .positive()
             .default(2)
             .describe('Number of recent turns (user+assistant pairs) to preserve'),
         maxSummaryTokens: z
-            .number()
             .int()
             .positive()
             .default(2000)
@@ -74,7 +71,6 @@ export const ReactiveOverflowCompactionConfigSchema = z
             .optional()
             .describe('Custom summary prompt template. Use {conversation} as placeholder'),
     })
-    .strict()
     .describe('Reactive overflow compaction configuration');
 
 export type ReactiveOverflowCompactionConfig = z.output<
@@ -82,11 +78,10 @@ export type ReactiveOverflowCompactionConfig = z.output<
 >;
 
 export const NoOpCompactionConfigSchema = z
-    .object({
+    .strictObject({
         type: z.literal('noop'),
         ...CommonCompactionFields,
     })
-    .strict()
     .describe('No-op compaction configuration');
 
 export type NoOpCompactionConfig = z.output<typeof NoOpCompactionConfigSchema>;

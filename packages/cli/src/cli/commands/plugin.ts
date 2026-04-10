@@ -27,69 +27,48 @@ import {
 
 // === Schema Definitions ===
 
-const PluginListCommandSchema = z
-    .object({
-        verbose: z.boolean().default(false).describe('Show detailed plugin information'),
-    })
-    .strict();
+const PluginListCommandSchema = z.strictObject({
+    verbose: z.boolean().default(false).describe('Show detailed plugin information'),
+});
 
-const PluginInstallCommandSchema = z
-    .object({
-        path: z.string().min(1).describe('Path to the plugin directory'),
-        scope: z.enum(['user', 'project', 'local']).default('user').describe('Installation scope'),
-        force: z.boolean().default(false).describe('Force overwrite if already installed'),
-    })
-    .strict();
+const PluginInstallCommandSchema = z.strictObject({
+    path: z.string().min(1).describe('Path to the plugin directory'),
+    scope: z.enum(['user', 'project', 'local']).default('user').describe('Installation scope'),
+    force: z.boolean().default(false).describe('Force overwrite if already installed'),
+});
 
-const PluginUninstallCommandSchema = z
-    .object({
-        name: z.string().min(1).describe('Name of the plugin to uninstall'),
-    })
-    .strict();
+const PluginUninstallCommandSchema = z.strictObject({
+    name: z.string().min(1).describe('Name of the plugin to uninstall'),
+});
 
-const PluginValidateCommandSchema = z
-    .object({
-        path: z.string().default('.').describe('Path to the plugin directory to validate'),
-    })
-    .strict();
+const PluginValidateCommandSchema = z.strictObject({
+    path: z.string().default('.').describe('Path to the plugin directory to validate'),
+});
 
 // === Marketplace Command Schemas ===
 
-const MarketplaceAddCommandSchema = z
-    .object({
-        source: z
-            .string()
-            .min(1)
-            .describe('Marketplace source (owner/repo, git URL, or local path)'),
-        name: z.string().optional().describe('Custom name for the marketplace'),
-    })
-    .strict();
+const MarketplaceAddCommandSchema = z.strictObject({
+    source: z.string().min(1).describe('Marketplace source (owner/repo, git URL, or local path)'),
+    name: z.string().optional().describe('Custom name for the marketplace'),
+});
 
-const MarketplaceRemoveCommandSchema = z
-    .object({
-        name: z.string().min(1).describe('Name of the marketplace to remove'),
-    })
-    .strict();
+const MarketplaceRemoveCommandSchema = z.strictObject({
+    name: z.string().min(1).describe('Name of the marketplace to remove'),
+});
 
-const MarketplaceUpdateCommandSchema = z
-    .object({
-        name: z.string().optional().describe('Name of the marketplace to update (all if omitted)'),
-    })
-    .strict();
+const MarketplaceUpdateCommandSchema = z.strictObject({
+    name: z.string().optional().describe('Name of the marketplace to update (all if omitted)'),
+});
 
-const MarketplaceListCommandSchema = z
-    .object({
-        verbose: z.boolean().default(false).describe('Show detailed marketplace information'),
-    })
-    .strict();
+const MarketplaceListCommandSchema = z.strictObject({
+    verbose: z.boolean().default(false).describe('Show detailed marketplace information'),
+});
 
-const MarketplaceInstallCommandSchema = z
-    .object({
-        plugin: z.string().min(1).describe('Plugin spec: name or name@marketplace'),
-        scope: z.enum(['user', 'project', 'local']).default('user').describe('Installation scope'),
-        force: z.boolean().default(false).describe('Force reinstall if already exists'),
-    })
-    .strict();
+const MarketplaceInstallCommandSchema = z.strictObject({
+    plugin: z.string().min(1).describe('Plugin spec: name or name@marketplace'),
+    scope: z.enum(['user', 'project', 'local']).default('user').describe('Installation scope'),
+    force: z.boolean().default(false).describe('Force reinstall if already exists'),
+});
 
 // === Type Exports ===
 

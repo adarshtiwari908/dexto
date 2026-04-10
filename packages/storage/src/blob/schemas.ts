@@ -10,25 +10,21 @@ export type BlobStoreType = (typeof BLOB_STORE_TYPES)[number];
 /**
  * In-memory blob store configuration
  */
-const InMemoryBlobStoreSchema = z
-    .object({
-        type: z.literal('in-memory').describe('Blob store type identifier'),
-        maxBlobSize: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(10 * 1024 * 1024) // 10MB
-            .describe('Maximum size per blob in bytes'),
-        maxTotalSize: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(100 * 1024 * 1024) // 100MB
-            .describe('Maximum total storage size in bytes'),
-    })
-    .strict();
+const InMemoryBlobStoreSchema = z.strictObject({
+    type: z.literal('in-memory').describe('Blob store type identifier'),
+    maxBlobSize: z
+        .int()
+        .positive()
+        .optional()
+        .default(10 * 1024 * 1024) // 10MB
+        .describe('Maximum size per blob in bytes'),
+    maxTotalSize: z
+        .int()
+        .positive()
+        .optional()
+        .default(100 * 1024 * 1024) // 100MB
+        .describe('Maximum total storage size in bytes'),
+});
 
 export type InMemoryBlobStoreConfigInput = z.input<typeof InMemoryBlobStoreSchema>;
 export type InMemoryBlobStoreConfig = z.output<typeof InMemoryBlobStoreSchema>;
@@ -36,37 +32,32 @@ export type InMemoryBlobStoreConfig = z.output<typeof InMemoryBlobStoreSchema>;
 /**
  * Local filesystem blob store configuration
  */
-const LocalBlobStoreSchema = z
-    .object({
-        type: z.literal('local').describe('Blob store type identifier'),
-        storePath: z
-            .string()
-            .describe(
-                'Blob storage directory path (required for local storage - CLI enrichment provides per-agent default)'
-            ),
-        maxBlobSize: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(50 * 1024 * 1024) // 50MB
-            .describe('Maximum size per blob in bytes'),
-        maxTotalSize: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(1024 * 1024 * 1024) // 1GB
-            .describe('Maximum total storage size in bytes'),
-        cleanupAfterDays: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(30)
-            .describe('Auto-cleanup blobs older than N days'),
-    })
-    .strict();
+const LocalBlobStoreSchema = z.strictObject({
+    type: z.literal('local').describe('Blob store type identifier'),
+    storePath: z
+        .string()
+        .describe(
+            'Blob storage directory path (required for local storage - CLI enrichment provides per-agent default)'
+        ),
+    maxBlobSize: z
+        .int()
+        .positive()
+        .optional()
+        .default(50 * 1024 * 1024) // 50MB
+        .describe('Maximum size per blob in bytes'),
+    maxTotalSize: z
+        .int()
+        .positive()
+        .optional()
+        .default(1024 * 1024 * 1024) // 1GB
+        .describe('Maximum total storage size in bytes'),
+    cleanupAfterDays: z
+        .int()
+        .positive()
+        .optional()
+        .default(30)
+        .describe('Auto-cleanup blobs older than N days'),
+});
 
 export type LocalBlobStoreConfigInput = z.input<typeof LocalBlobStoreSchema>;
 export type LocalBlobStoreConfig = z.output<typeof LocalBlobStoreSchema>;
@@ -90,10 +81,9 @@ export type LocalBlobStoreConfig = z.output<typeof LocalBlobStoreSchema>;
  * 3. Core receives a concrete `BlobStore` instance (DI)
  */
 export const BlobStoreConfigSchema = z
-    .object({
+    .looseObject({
         type: z.string().describe('Blob store backend type'),
     })
-    .passthrough()
     .describe('Blob store configuration (validated by image factory)');
 
 /**

@@ -27,12 +27,10 @@ export type BuiltinToolName = (typeof BUILTIN_TOOL_NAMES)[number];
 
 const BuiltinToolNameSchema = z.enum(BUILTIN_TOOL_NAMES);
 
-export const BuiltinToolsConfigSchema = z
-    .object({
-        type: z.literal('builtin-tools'),
-        enabledTools: z.array(BuiltinToolNameSchema).optional(),
-    })
-    .strict();
+export const BuiltinToolsConfigSchema = z.strictObject({
+    type: z.literal('builtin-tools'),
+    enabledTools: z.array(BuiltinToolNameSchema).optional(),
+});
 
 export type BuiltinToolsConfig = z.output<typeof BuiltinToolsConfigSchema>;
 

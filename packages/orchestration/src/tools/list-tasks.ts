@@ -13,19 +13,17 @@ import type { TaskRegistry } from '../task-registry.js';
 /**
  * Input schema for list_tasks tool
  */
-export const ListTasksInputSchema = z
-    .object({
-        /** Filter by status */
-        status: z
-            .enum(['pending', 'running', 'completed', 'failed', 'cancelled', 'all'])
-            .optional()
-            .default('all')
-            .describe('Filter tasks by status'),
+export const ListTasksInputSchema = z.strictObject({
+    /** Filter by status */
+    status: z
+        .enum(['pending', 'running', 'completed', 'failed', 'cancelled', 'all'])
+        .optional()
+        .default('all')
+        .describe('Filter tasks by status'),
 
-        /** Filter by type */
-        type: z.enum(['agent', 'process', 'generic']).optional().describe('Filter tasks by type'),
-    })
-    .strict();
+    /** Filter by type */
+    type: z.enum(['agent', 'process', 'generic']).optional().describe('Filter tasks by type'),
+});
 
 export type ListTasksInput = z.output<typeof ListTasksInputSchema>;
 

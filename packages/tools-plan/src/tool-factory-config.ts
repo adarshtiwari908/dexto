@@ -18,20 +18,18 @@ export const PLAN_TOOL_NAMES = ['plan_create', 'plan_read', 'plan_update', 'plan
 /**
  * Configuration schema for Plan tools factory
  */
-export const PlanToolsConfigSchema = z
-    .object({
-        type: z.literal('plan-tools'),
-        basePath: z
-            .string()
-            .default('.dexto/plans')
-            .describe('Base directory for plan storage (relative to working directory)'),
-        enabledTools: z
-            .array(z.enum(PLAN_TOOL_NAMES))
-            .optional()
-            .describe(
-                `Subset of tools to enable. If not specified, all tools are enabled. Available: ${PLAN_TOOL_NAMES.join(', ')}`
-            ),
-    })
-    .strict();
+export const PlanToolsConfigSchema = z.strictObject({
+    type: z.literal('plan-tools'),
+    basePath: z
+        .string()
+        .default('.dexto/plans')
+        .describe('Base directory for plan storage (relative to working directory)'),
+    enabledTools: z
+        .array(z.enum(PLAN_TOOL_NAMES))
+        .optional()
+        .describe(
+            `Subset of tools to enable. If not specified, all tools are enabled. Available: ${PLAN_TOOL_NAMES.join(', ')}`
+        ),
+});
 
 export type PlanToolsConfig = z.output<typeof PlanToolsConfigSchema>;

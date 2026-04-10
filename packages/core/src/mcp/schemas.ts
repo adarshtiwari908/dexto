@@ -33,75 +33,69 @@ export const DEFAULT_MCP_CONNECTION_MODE: McpConnectionMode = 'lenient';
 
 // ---- stdio ----
 
-export const StdioServerConfigSchema = z
-    .object({
-        type: z.literal('stdio'),
-        enabled: z
-            .boolean()
-            .default(true)
-            .describe('Whether this server is enabled (disabled servers are not connected)'),
-        // allow env in command & args if you want; remove EnvExpandedString if not desired
-        command: EnvExpandedString().superRefine((s, ctx) => {
-            if (s.length === 0) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Stdio server requires a non-empty command',
-                    params: {
-                        code: MCPErrorCode.COMMAND_MISSING,
-                        scope: ErrorScope.MCP,
-                        type: ErrorType.USER,
-                    },
-                });
-            }
-        }),
-        args: z
-            .array(EnvExpandedString())
-            .default([])
-            .describe("Array of arguments for the command (e.g., ['script.js'])"),
-        env: z
-            .record(EnvExpandedString())
-            .default({})
-            .describe('Optional environment variables for the server process'),
-        timeout: z.coerce.number().int().positive().default(30000),
-        connectionMode: z.enum(MCP_CONNECTION_MODES).default(DEFAULT_MCP_CONNECTION_MODE),
-    })
-    .strict();
+export const StdioServerConfigSchema = z.strictObject({
+    type: z.literal('stdio'),
+    enabled: z
+        .boolean()
+        .default(true)
+        .describe('Whether this server is enabled (disabled servers are not connected)'),
+    // allow env in command & args if you want; remove EnvExpandedString if not desired
+    command: EnvExpandedString().superRefine((s, ctx) => {
+        if (s.length === 0) {
+            ctx.addIssue({
+                code: 'custom',
+                message: 'Stdio server requires a non-empty command',
+                params: {
+                    code: MCPErrorCode.COMMAND_MISSING,
+                    scope: ErrorScope.MCP,
+                    type: ErrorType.USER,
+                },
+            });
+        }
+    }),
+    args: z
+        .array(EnvExpandedString())
+        .default([])
+        .describe("Array of arguments for the command (e.g., ['script.js'])"),
+    env: z
+        .record(z.string(), EnvExpandedString())
+        .default({})
+        .describe('Optional environment variables for the server process'),
+    timeout: z.coerce.number().int().positive().prefault(30000),
+    connectionMode: z.enum(MCP_CONNECTION_MODES).default(DEFAULT_MCP_CONNECTION_MODE),
+});
 
 export type StdioServerConfig = z.input<typeof StdioServerConfigSchema>;
 export type ValidatedStdioServerConfig = z.output<typeof StdioServerConfigSchema>;
 // ---- sse ----
 
-export const SseServerConfigSchema = z
-    .object({
-        type: z.literal('sse'),
-        enabled: z
-            .boolean()
-            .default(true)
-            .describe('Whether this server is enabled (disabled servers are not connected)'),
-        url: RequiredEnvURL(process.env).describe('URL for the SSE server endpoint'),
-        headers: z.record(EnvExpandedString()).default({}),
-        timeout: z.coerce.number().int().positive().default(30000),
-        connectionMode: z.enum(MCP_CONNECTION_MODES).default(DEFAULT_MCP_CONNECTION_MODE),
-    })
-    .strict();
+export const SseServerConfigSchema = z.strictObject({
+    type: z.literal('sse'),
+    enabled: z
+        .boolean()
+        .default(true)
+        .describe('Whether this server is enabled (disabled servers are not connected)'),
+    url: RequiredEnvURL(process.env).describe('URL for the SSE server endpoint'),
+    headers: z.record(z.string(), EnvExpandedString()).default({}),
+    timeout: z.coerce.number().int().positive().prefault(30000),
+    connectionMode: z.enum(MCP_CONNECTION_MODES).default(DEFAULT_MCP_CONNECTION_MODE),
+});
 
 export type SseServerConfig = z.input<typeof SseServerConfigSchema>;
 export type ValidatedSseServerConfig = z.output<typeof SseServerConfigSchema>;
 // ---- http ----
 
-export const HttpServerConfigSchema = z
-    .object({
-        type: z.literal('http'),
-        enabled: z
-            .boolean()
-            .default(true)
-            .describe('Whether this server is enabled (disabled servers are not connected)'),
-        url: RequiredEnvURL(process.env).describe('URL for the HTTP server'),
-        headers: z.record(EnvExpandedString()).default({}),
-        timeout: z.coerce.number().int().positive().default(30000),
-        connectionMode: z.enum(MCP_CONNECTION_MODES).default(DEFAULT_MCP_CONNECTION_MODE),
-    })
-    .strict();
+export const HttpServerConfigSchema = z.strictObject({
+    type: z.literal('http'),
+    enabled: z
+        .boolean()
+        .default(true)
+        .describe('Whether this server is enabled (disabled servers are not connected)'),
+    url: RequiredEnvURL(process.env).describe('URL for the HTTP server'),
+    headers: z.record(z.string(), EnvExpandedString()).default({}),
+    timeout: z.coerce.number().int().positive().prefault(30000),
+    connectionMode: z.enum(MCP_CONNECTION_MODES).default(DEFAULT_MCP_CONNECTION_MODE),
+});
 
 export type HttpServerConfig = z.input<typeof HttpServerConfigSchema>;
 export type ValidatedHttpServerConfig = z.output<typeof HttpServerConfigSchema>;
@@ -122,7 +116,7 @@ export type McpServerConfig = z.input<typeof McpServerConfigSchema>;
 export type ValidatedMcpServerConfig = z.output<typeof McpServerConfigSchema>;
 
 export const ServersConfigSchema = z
-    .record(McpServerConfigSchema)
+    .record(z.string(), McpServerConfigSchema)
     .describe('A dictionary of server configurations, keyed by server name')
     .brand<'ValidatedServersConfig'>();
 

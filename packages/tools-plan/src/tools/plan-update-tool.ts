@@ -12,11 +12,9 @@ import type { Tool, ToolExecutionContext, DiffDisplayData } from '@dexto/core';
 import type { PlanServiceGetter } from '../plan-service-getter.js';
 import { PlanError } from '../errors.js';
 
-const PlanUpdateInputSchema = z
-    .object({
-        content: z.string().describe('Updated plan content in markdown format'),
-    })
-    .strict();
+const PlanUpdateInputSchema = z.strictObject({
+    content: z.string().describe('Updated plan content in markdown format'),
+});
 
 /**
  * Generate diff preview for plan update

@@ -1,4 +1,4 @@
-import type { ZodTypeAny } from 'zod';
+import type { ZodType } from 'zod';
 import type { Tool } from './types.js';
 
 /**
@@ -8,6 +8,6 @@ import type { Tool } from './types.js';
  * when the object literal is contextually typed. `defineTool(...)` provides that
  * context and keeps tool definitions consistent across packages.
  */
-export function defineTool<const TSchema extends ZodTypeAny>(tool: Tool<TSchema>): Tool<TSchema> {
+export function defineTool<const TSchema extends ZodType>(tool: Tool<TSchema>): Tool<TSchema> {
     return tool;
 }

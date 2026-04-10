@@ -8,23 +8,24 @@ import type {
     ToolExecutionContext,
 } from '@dexto/core';
 
-const InvokeSkillInputSchema = z
-    .object({
-        skill: z
-            .string()
-            .min(1, 'Skill name is required')
-            .describe(
-                'The name of the skill to invoke (e.g., "plugin-name:skill-name" or "skill-name")'
-            ),
-        args: z.record(z.string()).optional().describe('Optional arguments to pass to the skill'),
-        taskContext: z
-            .string()
-            .optional()
-            .describe(
-                'Context about what task this skill should accomplish. Recommended for forked skills to provide context since they run in isolation without conversation history.'
-            ),
-    })
-    .strict();
+const InvokeSkillInputSchema = z.strictObject({
+    skill: z
+        .string()
+        .min(1, 'Skill name is required')
+        .describe(
+            'The name of the skill to invoke (e.g., "plugin-name:skill-name" or "skill-name")'
+        ),
+    args: z
+        .record(z.string(), z.string())
+        .optional()
+        .describe('Optional arguments to pass to the skill'),
+    taskContext: z
+        .string()
+        .optional()
+        .describe(
+            'Context about what task this skill should accomplish. Recommended for forked skills to provide context since they run in isolation without conversation history.'
+        ),
+});
 
 /**
  * Create the `invoke_skill` tool.

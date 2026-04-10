@@ -2,35 +2,32 @@ import { z } from 'zod';
 import { ToolError, createLocalToolCallHeader, defineTool, truncateForHeader } from '@dexto/core';
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 
-const AskUserInputSchema = z
-    .object({
-        question: z
-            .string()
-            .describe(
-                'High-level prompt/title for the form. Keep this short; clients may display or ignore it.'
-            ),
-        schema: z
-            .object({
-                type: z.literal('object'),
-                properties: z.record(z.string(), z.record(z.unknown())),
-                required: z.array(z.string()).optional(),
-            })
-            .passthrough()
-            .describe(
-                [
-                    'JSON Schema defining form fields (object schema only).',
-                    'Deterministic UI mapping (recommended):',
-                    '- `properties[field].title`: main question/label shown prominently (keep ≲ 80 chars).',
-                    '- `properties[field].description`: optional help text (keep ≲ 120 chars).',
-                    '- `properties[field]["x-dexto"].stepLabel`: short wizard/step label (keep ≲ 16 chars).',
-                    'Use stable, descriptive property keys (avoid generic names like "q1").',
-                    'Use `enum` for single-choice lists, `boolean` for yes/no, `number` for numeric inputs, `string` for text.',
-                    'For multi-select, use `type: "array"` with `items: { enum: [...] }`.',
-                    'Include a top-level `required` array for mandatory fields.',
-                ].join(' ')
-            ),
-    })
-    .strict();
+const AskUserInputSchema = z.strictObject({
+    question: z
+        .string()
+        .describe(
+            'High-level prompt/title for the form. Keep this short; clients may display or ignore it.'
+        ),
+    schema: z
+        .looseObject({
+            type: z.literal('object'),
+            properties: z.record(z.string(), z.record(z.string(), z.unknown())),
+            required: z.array(z.string()).optional(),
+        })
+        .describe(
+            [
+                'JSON Schema defining form fields (object schema only).',
+                'Deterministic UI mapping (recommended):',
+                '- `properties[field].title`: main question/label shown prominently (keep ≲ 80 chars).',
+                '- `properties[field].description`: optional help text (keep ≲ 120 chars).',
+                '- `properties[field]["x-dexto"].stepLabel`: short wizard/step label (keep ≲ 16 chars).',
+                'Use stable, descriptive property keys (avoid generic names like "q1").',
+                'Use `enum` for single-choice lists, `boolean` for yes/no, `number` for numeric inputs, `string` for text.',
+                'For multi-select, use `type: "array"` with `items: { enum: [...] }`.',
+                'Include a top-level `required` array for mandatory fields.',
+            ].join(' ')
+        ),
+});
 
 type AskUserInput = z.output<typeof AskUserInputSchema>;
 type JsonSchema = AskUserInput['schema'];

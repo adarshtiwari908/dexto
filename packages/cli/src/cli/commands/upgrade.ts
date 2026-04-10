@@ -8,12 +8,10 @@ import {
     normalizeRequestedVersion,
 } from '../utils/self-management.js';
 
-const UpgradeCommandSchema = z
-    .object({
-        dryRun: z.boolean().default(false),
-        force: z.boolean().default(false),
-    })
-    .strict();
+const UpgradeCommandSchema = z.strictObject({
+    dryRun: z.boolean().default(false),
+    force: z.boolean().default(false),
+});
 
 export type UpgradeCommandOptions = z.output<typeof UpgradeCommandSchema>;
 

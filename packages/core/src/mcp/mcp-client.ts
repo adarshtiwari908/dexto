@@ -756,17 +756,13 @@ export class DextoMcpClient extends EventEmitter implements McpClient {
         }
 
         // Create the request schema for elicitation/create
-        const ElicitationCreateRequestSchema = z
-            .object({
-                method: z.literal('elicitation/create'),
-                params: z
-                    .object({
-                        message: z.string(),
-                        requestedSchema: z.unknown(),
-                    })
-                    .passthrough(),
-            })
-            .passthrough();
+        const ElicitationCreateRequestSchema = z.looseObject({
+            method: z.literal('elicitation/create'),
+            params: z.looseObject({
+                message: z.string(),
+                requestedSchema: z.unknown(),
+            }),
+        });
 
         // Set up request handler for elicitation/create
         this.client.setRequestHandler(ElicitationCreateRequestSchema, async (request) => {

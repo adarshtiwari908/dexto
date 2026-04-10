@@ -41,22 +41,20 @@ function computeContentHash(content: string): string {
     return createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
-const WriteFileInputSchema = z
-    .object({
-        file_path: z.string().min(1).describe('Absolute path where the file should be written'),
-        content: z.string().describe('Content to write to the file'),
-        create_dirs: z
-            .boolean()
-            .optional()
-            .default(false)
-            .describe("Create parent directories if they don't exist (default: false)"),
-        encoding: z
-            .enum(['utf-8', 'ascii', 'latin1', 'utf16le'])
-            .optional()
-            .default('utf-8')
-            .describe('File encoding (default: utf-8)'),
-    })
-    .strict();
+const WriteFileInputSchema = z.strictObject({
+    file_path: z.string().min(1).describe('Absolute path where the file should be written'),
+    content: z.string().describe('Content to write to the file'),
+    create_dirs: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe("Create parent directories if they don't exist (default: false)"),
+    encoding: z
+        .enum(['utf-8', 'ascii', 'latin1', 'utf16le'])
+        .optional()
+        .default('utf-8')
+        .describe('File encoding (default: utf-8)'),
+});
 
 /**
  * Generate diff preview without modifying the file

@@ -9,33 +9,30 @@ import {
     truncateForHeader,
 } from '@dexto/core';
 
-const DelegateToUrlInputSchema = z
-    .object({
-        url: z
-            .string()
-            .url()
-            .describe(
-                'The A2A-compliant agent URL (e.g., "http://localhost:3001" or "https://agent.example.com"). The tool will automatically append the correct JSON-RPC endpoint.'
-            ),
-        message: z
-            .string()
-            .min(1)
-            .describe(
-                'The message or task to delegate to the agent. This will be sent as natural language input.'
-            ),
-        sessionId: z
-            .string()
-            .optional()
-            .describe(
-                'Optional session ID for maintaining conversation state across multiple delegations to the same agent'
-            ),
-        timeout: z
-            .number()
-            .optional()
-            .default(30000)
-            .describe('Request timeout in milliseconds (default: 30000)'),
-    })
-    .strict();
+const DelegateToUrlInputSchema = z.strictObject({
+    url: z
+        .url()
+        .describe(
+            'The A2A-compliant agent URL (e.g., "http://localhost:3001" or "https://agent.example.com"). The tool will automatically append the correct JSON-RPC endpoint.'
+        ),
+    message: z
+        .string()
+        .min(1)
+        .describe(
+            'The message or task to delegate to the agent. This will be sent as natural language input.'
+        ),
+    sessionId: z
+        .string()
+        .optional()
+        .describe(
+            'Optional session ID for maintaining conversation state across multiple delegations to the same agent'
+        ),
+    timeout: z
+        .number()
+        .optional()
+        .default(30000)
+        .describe('Request timeout in milliseconds (default: 30000)'),
+});
 
 interface A2AMessage {
     role: 'user' | 'agent';

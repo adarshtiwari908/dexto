@@ -14,61 +14,59 @@ const FileExtensionSchema = z
 /**
  * Schema for filesystem resource configuration
  */
-const FileSystemResourceSchema = z
-    .object({
-        type: z.literal('filesystem'),
-        paths: z
-            .array(z.string())
-            .min(1)
-            .describe('File paths or directories to expose as resources (at least one required)'),
-        maxDepth: z
-            .number()
-            .min(1)
-            .max(10)
-            .default(3)
-            .describe('Maximum directory depth to traverse (default: 3)'),
-        maxFiles: z
-            .number()
-            .min(1)
-            .max(10000)
-            .default(1000)
-            .describe('Maximum number of files to include (default: 1000)'),
-        includeHidden: z
-            .boolean()
-            .default(false)
-            .describe('Include hidden files and directories (default: false)'),
-        includeExtensions: z
-            .array(FileExtensionSchema)
-            .default([
-                '.txt',
-                '.md',
-                '.js',
-                '.ts',
-                '.json',
-                '.html',
-                '.css',
-                '.py',
-                '.yaml',
-                '.yml',
-                '.xml',
-                '.jsx',
-                '.tsx',
-                '.vue',
-                '.php',
-                '.rb',
-                '.go',
-                '.rs',
-                '.java',
-                '.kt',
-                '.swift',
-                '.sql',
-                '.sh',
-                '.bash',
-                '.zsh',
-            ])
-            .describe('File extensions to include (default: common text files)'),
-    })
-    .strict();
+const FileSystemResourceSchema = z.strictObject({
+    type: z.literal('filesystem'),
+    paths: z
+        .array(z.string())
+        .min(1)
+        .describe('File paths or directories to expose as resources (at least one required)'),
+    maxDepth: z
+        .number()
+        .min(1)
+        .max(10)
+        .default(3)
+        .describe('Maximum directory depth to traverse (default: 3)'),
+    maxFiles: z
+        .number()
+        .min(1)
+        .max(10000)
+        .default(1000)
+        .describe('Maximum number of files to include (default: 1000)'),
+    includeHidden: z
+        .boolean()
+        .default(false)
+        .describe('Include hidden files and directories (default: false)'),
+    includeExtensions: z
+        .array(FileExtensionSchema)
+        .default([
+            '.txt',
+            '.md',
+            '.js',
+            '.ts',
+            '.json',
+            '.html',
+            '.css',
+            '.py',
+            '.yaml',
+            '.yml',
+            '.xml',
+            '.jsx',
+            '.tsx',
+            '.vue',
+            '.php',
+            '.rb',
+            '.go',
+            '.rs',
+            '.java',
+            '.kt',
+            '.swift',
+            '.sql',
+            '.sh',
+            '.bash',
+            '.zsh',
+        ])
+        .describe('File extensions to include (default: common text files)'),
+});
 
 /**
  * Validated filesystem resource configuration type
@@ -83,10 +81,9 @@ export type ValidatedFileSystemResourceConfig = z.output<typeof FileSystemResour
  * in the 'storage.blob' section of the agent config.
  */
 const BlobResourceSchema = z
-    .object({
+    .strictObject({
         type: z.literal('blob').describe('Enable blob storage resource provider'),
     })
-    .strict()
     .describe(
         'Blob resource provider configuration - actual storage settings are in storage.blob section'
     );

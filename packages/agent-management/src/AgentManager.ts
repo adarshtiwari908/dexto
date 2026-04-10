@@ -39,22 +39,18 @@ export interface AgentMetadata {
 /**
  * Registry file schema
  */
-const RegistrySchema = z
-    .object({
-        agents: z.array(
-            z
-                .object({
-                    id: z.string(),
-                    name: z.string(),
-                    description: z.string(),
-                    configPath: z.string(),
-                    author: z.string().optional(),
-                    tags: z.array(z.string()).optional(),
-                })
-                .strict()
-        ),
-    })
-    .strict();
+const RegistrySchema = z.strictObject({
+    agents: z.array(
+        z.strictObject({
+            id: z.string(),
+            name: z.string(),
+            description: z.string(),
+            configPath: z.string(),
+            author: z.string().optional(),
+            tags: z.array(z.string()).optional(),
+        })
+    ),
+});
 
 type Registry = z.output<typeof RegistrySchema>;
 

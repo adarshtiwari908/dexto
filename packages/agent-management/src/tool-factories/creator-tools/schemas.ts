@@ -11,14 +11,12 @@ export const CREATOR_TOOL_NAMES = [
 
 export type CreatorToolName = (typeof CREATOR_TOOL_NAMES)[number];
 
-export const CreatorToolsConfigSchema = z
-    .object({
-        type: z.literal('creator-tools'),
-        enabledTools: z
-            .array(z.enum(CREATOR_TOOL_NAMES))
-            .optional()
-            .describe('Subset of creator tools to enable'),
-    })
-    .strict();
+export const CreatorToolsConfigSchema = z.strictObject({
+    type: z.literal('creator-tools'),
+    enabledTools: z
+        .array(z.enum(CREATOR_TOOL_NAMES))
+        .optional()
+        .describe('Subset of creator tools to enable'),
+});
 
 export type CreatorToolsConfig = z.output<typeof CreatorToolsConfigSchema>;

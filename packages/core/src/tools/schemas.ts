@@ -11,7 +11,7 @@ export const DEFAULT_ALLOWED_TOOLS_STORAGE: AllowedToolsStorageType = 'storage';
 
 // Tool policies schema - static allow/deny lists for fine-grained control
 export const ToolPoliciesSchema = z
-    .object({
+    .strictObject({
         alwaysAllow: z
             .array(z.string())
             .default([])
@@ -25,14 +25,13 @@ export const ToolPoliciesSchema = z
                 'Tools that are always denied (high-risk). Takes precedence over alwaysAllow. Use full qualified names (e.g., "mcp--filesystem--delete_file")'
             ),
     })
-    .strict()
     .default({ alwaysAllow: [], alwaysDeny: [] })
     .describe('Static tool policies for allow/deny lists');
 
 export type ToolPolicies = z.output<typeof ToolPoliciesSchema>;
 
 export const PermissionsConfigSchema = z
-    .object({
+    .strictObject({
         mode: z
             .enum(PERMISSIONS_MODES)
             .default(DEFAULT_PERMISSIONS_MODE)
@@ -40,7 +39,6 @@ export const PermissionsConfigSchema = z
                 'Tool permissions mode: manual (interactive), auto-approve (all tools), auto-deny (no tools)'
             ),
         timeout: z
-            .number()
             .int()
             .positive()
             .optional()
@@ -57,7 +55,6 @@ export const PermissionsConfigSchema = z
             'Static tool policies for fine-grained allow/deny control. Deny list takes precedence over allow list.'
         ),
     })
-    .strict()
     .describe('Tool permissions and approval configuration');
 
 export type PermissionsConfig = z.input<typeof PermissionsConfigSchema>;
@@ -65,7 +62,7 @@ export type ValidatedPermissionsConfig = z.output<typeof PermissionsConfigSchema
 
 // Elicitation configuration schema - independent from tool permissions
 export const ElicitationConfigSchema = z
-    .object({
+    .strictObject({
         enabled: z
             .boolean()
             .default(false)
@@ -73,7 +70,6 @@ export const ElicitationConfigSchema = z
                 'Enable elicitation support (ask_user tool and MCP server elicitations). When disabled, elicitation requests will be rejected.'
             ),
         timeout: z
-            .number()
             .int()
             .positive()
             .optional()
@@ -81,7 +77,6 @@ export const ElicitationConfigSchema = z
                 'Timeout for elicitation requests in milliseconds. If not set, waits indefinitely.'
             ),
     })
-    .strict()
     .describe(
         'Elicitation configuration for user input requests. Independent from tool permissions mode, allowing auto-approve for tools while still supporting elicitation.'
     );
@@ -90,19 +85,14 @@ export type ElicitationConfig = z.input<typeof ElicitationConfigSchema>;
 export type ValidatedElicitationConfig = z.output<typeof ElicitationConfigSchema>;
 
 // Tool limits configuration
-export const ToolLimitsSchema = z
-    .object({
-        maxOutputChars: z
-            .number()
-            .optional()
-            .describe('Maximum number of characters for tool output'),
-        maxLines: z.number().optional().describe('Maximum number of lines for tool output'),
-        maxLineLength: z.number().optional().describe('Maximum length of a single line'),
-    })
-    .strict();
+export const ToolLimitsSchema = z.strictObject({
+    maxOutputChars: z.number().optional().describe('Maximum number of characters for tool output'),
+    maxLines: z.number().optional().describe('Maximum number of lines for tool output'),
+    maxLineLength: z.number().optional().describe('Maximum length of a single line'),
+});
 
 export const ToolsConfigSchema = z
-    .record(ToolLimitsSchema)
+    .record(z.string(), ToolLimitsSchema)
     .describe('Per-tool configuration limits');
 
 export type ToolsConfig = z.output<typeof ToolsConfigSchema>;

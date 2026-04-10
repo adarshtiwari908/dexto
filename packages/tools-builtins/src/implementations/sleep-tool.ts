@@ -2,16 +2,9 @@ import { z } from 'zod';
 import { createLocalToolCallHeader, defineTool } from '@dexto/core';
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 
-const SleepInputSchema = z
-    .object({
-        ms: z
-            .number()
-            .int()
-            .positive()
-            .max(600000)
-            .describe('Milliseconds to sleep (max 10 minutes)'),
-    })
-    .strict();
+const SleepInputSchema = z.strictObject({
+    ms: z.int().positive().max(600000).describe('Milliseconds to sleep (max 10 minutes)'),
+});
 
 /**
  * Internal tool for sleeping/delaying execution.

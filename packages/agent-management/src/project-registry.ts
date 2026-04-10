@@ -6,32 +6,30 @@ import { z } from 'zod';
 const NonEmptyStringSchema = z.string().trim().min(1);
 
 export const ProjectRegistryEntrySchema = z
-    .object({
+    .strictObject({
         id: NonEmptyStringSchema,
         name: NonEmptyStringSchema,
-        description: NonEmptyStringSchema,
         configPath: NonEmptyStringSchema,
         author: NonEmptyStringSchema.optional(),
         tags: z.array(NonEmptyStringSchema).optional(),
         parentAgentId: NonEmptyStringSchema.optional(),
     })
-    .strict();
+    .describe(NonEmptyStringSchema);
 
 export type ProjectRegistryEntry = z.output<typeof ProjectRegistryEntrySchema>;
 
 export const ProjectRegistrySchema = z
-    .object({
+    .strictObject({
         primaryAgent: NonEmptyStringSchema.optional(),
         allowGlobalAgents: z.boolean().default(false),
         agents: z.array(ProjectRegistryEntrySchema),
     })
-    .strict()
     .superRefine((registry, ctx) => {
         const seenIds = new Set<string>();
         for (const [index, agent] of registry.agents.entries()) {
             if (seenIds.has(agent.id)) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: ['agents', index, 'id'],
                     message: `Duplicate agent id '${agent.id}'.`,
                 });
@@ -46,7 +44,7 @@ export const ProjectRegistrySchema = z
             !registry.agents.some((agent) => agent.id === registry.primaryAgent)
         ) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['primaryAgent'],
                 message: `Primary agent '${registry.primaryAgent}' must match an agent id in 'agents'.`,
             });

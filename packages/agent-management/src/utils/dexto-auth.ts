@@ -26,7 +26,7 @@ const AuthConfigSchema = z
         dextoApiKeySource: z.enum(['provisioned', 'user-supplied']).optional(),
     })
     .refine((data) => data.token || data.dextoApiKey, {
-        message: 'Either token or dextoApiKey is required',
+        error: 'Either token or dextoApiKey is required',
     });
 
 type AuthConfig = z.output<typeof AuthConfigSchema>;

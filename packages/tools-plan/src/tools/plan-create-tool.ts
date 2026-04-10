@@ -11,16 +11,14 @@ import type { Tool, ToolExecutionContext, FileDisplayData } from '@dexto/core';
 import type { PlanServiceGetter } from '../plan-service-getter.js';
 import { PlanError } from '../errors.js';
 
-const PlanCreateInputSchema = z
-    .object({
-        title: z.string().describe('Plan title (e.g., "Add User Authentication")'),
-        content: z
-            .string()
-            .describe(
-                'Plan content in markdown format. Use - [ ] and - [x] for checkboxes to track progress.'
-            ),
-    })
-    .strict();
+const PlanCreateInputSchema = z.strictObject({
+    title: z.string().describe('Plan title (e.g., "Add User Authentication")'),
+    content: z
+        .string()
+        .describe(
+            'Plan content in markdown format. Use - [ ] and - [x] for checkboxes to track progress.'
+        ),
+});
 
 /**
  * Creates the plan_create tool

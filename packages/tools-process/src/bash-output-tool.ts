@@ -9,11 +9,9 @@ import { createLocalToolCallHeader, defineTool, truncateForHeader } from '@dexto
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 import type { ProcessServiceGetter } from './bash-exec-tool.js';
 
-const BashOutputInputSchema = z
-    .object({
-        process_id: z.string().describe('Process ID from bash_exec (when run_in_background=true)'),
-    })
-    .strict();
+const BashOutputInputSchema = z.strictObject({
+    process_id: z.string().describe('Process ID from bash_exec (when run_in_background=true)'),
+});
 
 /**
  * Create the bash_output internal tool

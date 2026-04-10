@@ -32,11 +32,11 @@
     "@dexto/storage": "workspace:*",
     "@dexto/tools-scheduler": "workspace:*",
     "@hono/node-server": "1.19.11",
-    "@hono/zod-openapi": "^0.19.1",
+    "@hono/zod-openapi": "^1.2.4",
+    "@modelcontextprotocol/sdk": "^1.28.0",
     "hono": "^4.12.9",
     "ws": "^8.18.1",
-    "yaml": "^2.8.3",
-    "@modelcontextprotocol/sdk": "^1.28.0"
+    "yaml": "^2.8.3"
   },
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsup && node ../../scripts/clean-tsbuildinfo.mjs && cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc -b tsconfig.json --emitDeclarationOnly",
@@ -55,7 +55,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@types/ws": "^8.5.11",
-    "zod": "^3.25.0"
+    "zod": "^4.3.6"
   },
   "peerDependencies": {
     "zod": "^3.25.0"

@@ -5,13 +5,11 @@ import { getAgentRegistry } from '@dexto/agent-management';
 import { capture } from '../../../analytics/index.js';
 
 // Zod schema for uninstall command validation
-const UninstallCommandSchema = z
-    .object({
-        agents: z.array(z.string().min(1, 'Agent name cannot be empty')),
-        all: z.boolean().default(false),
-        force: z.boolean().default(false),
-    })
-    .strict();
+const UninstallCommandSchema = z.strictObject({
+    agents: z.array(z.string().min(1, 'Agent name cannot be empty')),
+    all: z.boolean().default(false),
+    force: z.boolean().default(false),
+});
 
 export type UninstallCommandOptions = z.output<typeof UninstallCommandSchema>;
 

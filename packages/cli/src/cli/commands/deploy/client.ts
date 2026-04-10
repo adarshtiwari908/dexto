@@ -11,185 +11,146 @@ const DEFAULT_SANDBOX_URL = 'https://sandbox.dexto.ai';
 
 type RequestHeaders = Record<string, string> | Array<[string, string]>;
 
-const CloudAgentStateSchema = z
-    .object({
-        status: z.string(),
-    })
-    .passthrough();
+const CloudAgentStateSchema = z.looseObject({
+    status: z.string(),
+});
 
-const CloudAgentSummarySchema = z
-    .object({
-        runId: z.string(),
-        agentUrl: z.string(),
-        hostUrl: z.string().nullable().optional(),
-        state: CloudAgentStateSchema,
-    })
-    .passthrough();
+const CloudAgentSummarySchema = z.looseObject({
+    runId: z.string(),
+    agentUrl: z.string(),
+    hostUrl: z.string().nullable().optional(),
+    state: CloudAgentStateSchema,
+});
 
-const CloudAgentListItemSchema = z
-    .object({
-        cloudAgentId: z.string(),
-        name: z.string().nullable().optional(),
-        agentUrl: z.string(),
-        hostUrl: z.string().nullable().optional(),
-        state: CloudAgentStateSchema,
-    })
-    .passthrough();
+const CloudAgentListItemSchema = z.looseObject({
+    cloudAgentId: z.string(),
+    name: z.string().nullable().optional(),
+    agentUrl: z.string(),
+    hostUrl: z.string().nullable().optional(),
+    state: CloudAgentStateSchema,
+});
 
-const DeployResponseSchema = z
-    .object({
-        success: z.boolean(),
-        error: z.string().optional(),
-        data: z
-            .object({
-                cloudAgentId: z.string(),
-                agentUrl: z.string(),
-                cloudAgent: CloudAgentSummarySchema,
-            })
-            .passthrough()
-            .optional(),
-    })
-    .passthrough();
+const DeployResponseSchema = z.looseObject({
+    success: z.boolean(),
+    error: z.string().optional(),
+    data: z
+        .looseObject({
+            cloudAgentId: z.string(),
+            agentUrl: z.string(),
+            cloudAgent: CloudAgentSummarySchema,
+        })
+        .optional(),
+});
 
-const StatusResponseSchema = z
-    .object({
-        success: z.boolean(),
-        error: z.string().optional(),
-        data: z
-            .object({
-                cloudAgentId: z.string(),
-                agentUrl: z.string(),
-                cloudAgent: CloudAgentSummarySchema,
-                stale: z.boolean().optional(),
-            })
-            .passthrough()
-            .optional(),
-    })
-    .passthrough();
+const StatusResponseSchema = z.looseObject({
+    success: z.boolean(),
+    error: z.string().optional(),
+    data: z
+        .looseObject({
+            cloudAgentId: z.string(),
+            agentUrl: z.string(),
+            cloudAgent: CloudAgentSummarySchema,
+            stale: z.boolean().optional(),
+        })
+        .optional(),
+});
 
-const ListResponseSchema = z
-    .object({
-        success: z.boolean(),
-        error: z.string().optional(),
-        data: z
-            .object({
-                cloudAgents: z.array(CloudAgentListItemSchema),
-            })
-            .passthrough()
-            .optional(),
-    })
-    .passthrough();
+const ListResponseSchema = z.looseObject({
+    success: z.boolean(),
+    error: z.string().optional(),
+    data: z
+        .looseObject({
+            cloudAgents: z.array(CloudAgentListItemSchema),
+        })
+        .optional(),
+});
 
-const StopResponseSchema = z
-    .object({
-        success: z.boolean(),
-        error: z.string().optional(),
-        data: z
-            .object({
-                cloudAgentId: z.string(),
-                agentUrl: z.string(),
-                stopped: z.boolean(),
-                alreadyStopped: z.boolean(),
-                snapshotStatus: z.string(),
-            })
-            .passthrough()
-            .optional(),
-    })
-    .passthrough();
+const StopResponseSchema = z.looseObject({
+    success: z.boolean(),
+    error: z.string().optional(),
+    data: z
+        .looseObject({
+            cloudAgentId: z.string(),
+            agentUrl: z.string(),
+            stopped: z.boolean(),
+            alreadyStopped: z.boolean(),
+            snapshotStatus: z.string(),
+        })
+        .optional(),
+});
 
-const DeleteResponseSchema = z
-    .object({
-        success: z.boolean(),
-        error: z.string().optional(),
-        data: z
-            .object({
-                cloudAgentId: z.string(),
-                agentUrl: z.string(),
-            })
-            .passthrough()
-            .optional(),
-    })
-    .passthrough();
+const DeleteResponseSchema = z.looseObject({
+    success: z.boolean(),
+    error: z.string().optional(),
+    data: z
+        .looseObject({
+            cloudAgentId: z.string(),
+            agentUrl: z.string(),
+        })
+        .optional(),
+});
 
 const CloudChatContentPartSchema = z
     .discriminatedUnion('type', [
-        z
-            .object({
-                type: z.literal('text'),
-                text: z.string(),
-            })
-            .strict(),
-        z
-            .object({
-                type: z.literal('image'),
-                image: z.string(),
-                mimeType: z.string().optional(),
-            })
-            .strict(),
-        z
-            .object({
-                type: z.literal('file'),
-                data: z.string(),
-                mimeType: z.string(),
-                filename: z.string().optional(),
-            })
-            .strict(),
+        z.strictObject({
+            type: z.literal('text'),
+            text: z.string(),
+        }),
+        z.strictObject({
+            type: z.literal('image'),
+            image: z.string(),
+            mimeType: z.string().optional(),
+        }),
+        z.strictObject({
+            type: z.literal('file'),
+            data: z.string(),
+            mimeType: z.string(),
+            filename: z.string().optional(),
+        }),
     ])
     .describe('Cloud chat content part');
 
-const CloudChatSessionSchema = z
-    .object({
-        id: z.string(),
-        createdAt: z.number().nullable().optional(),
-        lastActivity: z.number().nullable().optional(),
-        messageCount: z.number().int().nonnegative().optional(),
-        title: z.string().nullable().optional(),
-        workspaceId: z.string().nullable().optional(),
-        parentSessionId: z.string().nullable().optional(),
-    })
-    .passthrough();
+const CloudChatSessionSchema = z.looseObject({
+    id: z.string(),
+    createdAt: z.number().nullable().optional(),
+    lastActivity: z.number().nullable().optional(),
+    messageCount: z.int().nonnegative().optional(),
+    title: z.string().nullable().optional(),
+    workspaceId: z.string().nullable().optional(),
+    parentSessionId: z.string().nullable().optional(),
+});
 
-const CloudChatSessionListResponseSchema = z
-    .object({
-        sessions: z.array(CloudChatSessionSchema),
-    })
-    .passthrough();
+const CloudChatSessionListResponseSchema = z.looseObject({
+    sessions: z.array(CloudChatSessionSchema),
+});
 
-const CloudChatSessionResponseSchema = z
-    .object({
-        session: CloudChatSessionSchema,
-    })
-    .passthrough();
+const CloudChatSessionResponseSchema = z.looseObject({
+    session: CloudChatSessionSchema,
+});
 
-const CloudChatHistoryMessageSchema = z
-    .object({
-        role: z.enum(['user', 'assistant', 'system', 'tool']),
-        content: z.array(CloudChatContentPartSchema),
-        timestamp: z.number().optional(),
-        name: z.string().optional(),
-        toolCallId: z.string().optional(),
-        success: z.boolean().optional(),
-        reasoning: z.string().optional(),
-        model: z.string().optional(),
-        provider: z.string().optional(),
-        displayData: z.unknown().optional(),
-        presentationSnapshot: z.unknown().optional(),
-    })
-    .passthrough();
+const CloudChatHistoryMessageSchema = z.looseObject({
+    role: z.enum(['user', 'assistant', 'system', 'tool']),
+    content: z.array(CloudChatContentPartSchema),
+    timestamp: z.number().optional(),
+    name: z.string().optional(),
+    toolCallId: z.string().optional(),
+    success: z.boolean().optional(),
+    reasoning: z.string().optional(),
+    model: z.string().optional(),
+    provider: z.string().optional(),
+    displayData: z.unknown().optional(),
+    presentationSnapshot: z.unknown().optional(),
+});
 
-const CloudChatHistoryResponseSchema = z
-    .object({
-        history: z.array(CloudChatHistoryMessageSchema),
-        isBusy: z.boolean().optional(),
-        stale: z.boolean().optional(),
-    })
-    .passthrough();
+const CloudChatHistoryResponseSchema = z.looseObject({
+    history: z.array(CloudChatHistoryMessageSchema),
+    isBusy: z.boolean().optional(),
+    stale: z.boolean().optional(),
+});
 
-const CloudChatApprovalsResponseSchema = z
-    .object({
-        approvals: z.array(z.unknown()).default([]),
-    })
-    .passthrough();
+const CloudChatApprovalsResponseSchema = z.looseObject({
+    approvals: z.array(z.unknown()).default([]),
+});
 
 export interface DeployCloudAgentResult {
     cloudAgentId: string;
@@ -343,7 +304,7 @@ async function request(
     });
 }
 
-function requireSuccessData<T extends z.ZodTypeAny>(
+function requireSuccessData<T extends z.ZodType>(
     payload: unknown,
     response: Response,
     schema: T
@@ -360,11 +321,10 @@ async function throwApiError(response: Response): Promise<never> {
     const parsed =
         payload && typeof payload === 'object' && payload !== null && 'error' in payload
             ? z
-                  .object({
+                  .looseObject({
                       error: z.string().optional(),
                       hint: z.string().optional(),
                   })
-                  .passthrough()
                   .safeParse(payload)
             : null;
     const errorMessage =
@@ -621,11 +581,10 @@ export function createDeployClient() {
             }
 
             const payload = z
-                .object({
+                .looseObject({
                     title: z.string().nullable().optional(),
                     sessionId: z.string().optional(),
                 })
-                .passthrough()
                 .parse(await response.json());
 
             return {
@@ -726,10 +685,9 @@ export function createDeployClient() {
             ) {
                 const busyPayload = await response.json().catch(() => null);
                 const parsed = z
-                    .object({
+                    .looseObject({
                         hint: z.string().optional(),
                     })
-                    .passthrough()
                     .safeParse(busyPayload);
                 throw new Error(
                     parsed.success

@@ -6,11 +6,9 @@ import { z } from 'zod';
 import { resolveAgentPath, resolveBundledScript } from '@dexto/agent-management';
 
 // Zod schema for which command validation
-const WhichCommandSchema = z
-    .object({
-        agentName: z.string().min(1, 'Agent name cannot be empty'),
-    })
-    .strict();
+const WhichCommandSchema = z.strictObject({
+    agentName: z.string().min(1, 'Agent name cannot be empty'),
+});
 
 export type WhichCommandOptions = z.output<typeof WhichCommandSchema>;
 

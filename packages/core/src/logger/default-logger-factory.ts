@@ -3,12 +3,10 @@ import { createLogger } from './factory.js';
 import { LoggerConfigSchema } from './v2/schemas.js';
 import type { Logger } from './v2/types.js';
 
-export const DefaultLoggerFactoryConfigSchema = z
-    .object({
-        agentId: z.string(),
-        config: LoggerConfigSchema,
-    })
-    .strict();
+export const DefaultLoggerFactoryConfigSchema = z.strictObject({
+    agentId: z.string(),
+    config: LoggerConfigSchema,
+});
 
 export type DefaultLoggerFactoryConfig = z.output<typeof DefaultLoggerFactoryConfigSchema>;
 

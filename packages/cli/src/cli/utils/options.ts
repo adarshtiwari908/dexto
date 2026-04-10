@@ -15,53 +15,51 @@ export function validateCliOptions(opts: any): void {
         .map((p) => p.toLowerCase());
 
     // Base schema for primitive shape
-    const cliOptionShape = z
-        .object({
-            agent: z.string().min(1, 'Agent name or path must not be empty').optional(),
-            strict: z.boolean().optional().default(false),
-            verbose: z.boolean().optional().default(true),
-            mode: z.enum(['web', 'cli', 'server', 'discord', 'telegram', 'mcp'], {
-                errorMap: () => ({
-                    message:
-                        'Mode must be one of "web", "cli", "server", "discord", "telegram", or "mcp"',
-                }),
-            }),
-            port: z
-                .string()
-                .refine(
-                    (val) => {
-                        const port = parseInt(val, 10);
-                        return !isNaN(port) && port > 0 && port <= 65535;
-                    },
-                    { message: 'Port must be a number between 1 and 65535' }
-                )
-                .optional(),
-            autoApprove: z
-                .boolean()
-                .optional()
-                .default(false)
-                .describe('Automatically approve all tool executions when true'),
-            bypassPermissions: z
-                .boolean()
-                .optional()
-                .default(false)
-                .describe(
-                    'Start the interactive CLI in bypass permissions mode (auto-approve approval prompts)'
-                ),
-            elicitation: z
-                .boolean()
-                .optional()
-                .default(true)
-                .describe('Enable elicitation (set to false with --no-elicitation)'),
-            provider: z.string().optional(),
-            model: z.string().optional(),
-            interactive: z
-                .boolean()
-                .optional()
-                .default(true)
-                .describe('Enable interactive prompts (set to false with --no-interactive)'),
-        })
-        .strict();
+    const cliOptionShape = z.strictObject({
+        agent: z.string().min(1, 'Agent name or path must not be empty').optional(),
+        strict: z.boolean().optional().default(false),
+        verbose: z.boolean().optional().default(true),
+        mode: z.enum(['web', 'cli', 'server', 'discord', 'telegram', 'mcp'], {
+            error: () =>
+                'Mode must be one of "web", "cli", "server", "discord", "telegram", or "mcp"',
+        }),
+        port: z
+            .string()
+            .refine(
+                (val) => {
+                    const port = parseInt(val, 10);
+                    return !isNaN(port) && port > 0 && port <= 65535;
+                },
+                {
+                    error: 'Port must be a number between 1 and 65535',
+                }
+            )
+            .optional(),
+        autoApprove: z
+            .boolean()
+            .optional()
+            .default(false)
+            .describe('Automatically approve all tool executions when true'),
+        bypassPermissions: z
+            .boolean()
+            .optional()
+            .default(false)
+            .describe(
+                'Start the interactive CLI in bypass permissions mode (auto-approve approval prompts)'
+            ),
+        elicitation: z
+            .boolean()
+            .optional()
+            .default(true)
+            .describe('Enable elicitation (set to false with --no-elicitation)'),
+        provider: z.string().optional(),
+        model: z.string().optional(),
+        interactive: z
+            .boolean()
+            .optional()
+            .default(true)
+            .describe('Enable interactive prompts (set to false with --no-interactive)'),
+    });
 
     // Basic semantic validation
     const cliOptionSchema = cliOptionShape
@@ -83,8 +81,7 @@ export function validateCliOptions(opts: any): void {
             },
             {
                 path: ['mode'],
-                message:
-                    "DISCORD_BOT_TOKEN must be set in environment variables when mode is 'discord'",
+                error: "DISCORD_BOT_TOKEN must be set in environment variables when mode is 'discord'",
             }
         )
         // 3) Check for TELEGRAM_BOT_TOKEN if mode is telegram
@@ -97,8 +94,7 @@ export function validateCliOptions(opts: any): void {
             },
             {
                 path: ['mode'],
-                message:
-                    "TELEGRAM_BOT_TOKEN must be set in environment variables when mode is 'telegram'",
+                error: "TELEGRAM_BOT_TOKEN must be set in environment variables when mode is 'telegram'",
             }
         );
 

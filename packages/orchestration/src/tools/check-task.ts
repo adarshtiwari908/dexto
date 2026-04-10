@@ -12,12 +12,10 @@ import type { TaskRegistry } from '../task-registry.js';
 /**
  * Input schema for check_task tool
  */
-export const CheckTaskInputSchema = z
-    .object({
-        /** Task ID to check */
-        taskId: z.string().describe('Task ID to check status of'),
-    })
-    .strict();
+export const CheckTaskInputSchema = z.strictObject({
+    /** Task ID to check */
+    taskId: z.string().describe('Task ID to check status of'),
+});
 
 export type CheckTaskInput = z.output<typeof CheckTaskInputSchema>;
 

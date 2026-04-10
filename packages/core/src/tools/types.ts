@@ -3,7 +3,7 @@
 // ============================================================================
 
 import type { JSONSchema7 } from 'json-schema';
-import type { z, ZodTypeAny } from 'zod';
+import type { z, ZodType } from 'zod';
 import type { ToolDisplayData } from './display-types.js';
 import type { WorkspaceContext } from '../workspace/types.js';
 import type { ApprovalRequestDetails, ApprovalResponse } from '../approval/types.js';
@@ -234,7 +234,7 @@ export type UiEffect =
 /**
  * Tool interface - for tools implemented within Dexto
  */
-export interface Tool<TSchema extends ZodTypeAny = ZodTypeAny> {
+export interface Tool<TSchema extends ZodType = ZodType> {
     /** Unique identifier for the tool */
     id: string;
 
@@ -276,7 +276,7 @@ export interface Tool<TSchema extends ZodTypeAny = ZodTypeAny> {
     // All approval and UI behavior must be expressed via `tool.approval` and `tool.presentation`.
 }
 
-export interface ToolApproval<TSchema extends ZodTypeAny = ZodTypeAny> {
+export interface ToolApproval<TSchema extends ZodType = ZodType> {
     override?(
         input: z.output<TSchema>,
         context: ToolExecutionContext
@@ -293,7 +293,7 @@ export interface ToolApproval<TSchema extends ZodTypeAny = ZodTypeAny> {
     suggestPatterns?(input: z.output<TSchema>): string[];
 }
 
-export interface ToolPresentation<TSchema extends ZodTypeAny = ZodTypeAny> {
+export interface ToolPresentation<TSchema extends ZodType = ZodType> {
     /**
      * Optional rich preview used in approval prompts.
      *

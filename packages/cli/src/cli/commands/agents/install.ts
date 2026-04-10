@@ -10,13 +10,11 @@ import { installBundledAgent, installCustomAgent } from '../../../utils/agent-he
 import { capture } from '../../../analytics/index.js';
 
 // Zod schema for install command validation
-const InstallCommandSchema = z
-    .object({
-        agents: z.array(z.string().min(1, 'Agent name cannot be empty')),
-        all: z.boolean().default(false),
-        force: z.boolean().default(false),
-    })
-    .strict();
+const InstallCommandSchema = z.strictObject({
+    agents: z.array(z.string().min(1, 'Agent name cannot be empty')),
+    all: z.boolean().default(false),
+    force: z.boolean().default(false),
+});
 
 export type InstallCommandOptions = z.output<typeof InstallCommandSchema>;
 

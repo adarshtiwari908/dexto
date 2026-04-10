@@ -8,31 +8,27 @@ export const MODEL_PICKER_STATE_VERSION = 1;
 export const MODEL_PICKER_RECENTS_LIMIT = 10;
 export const MODEL_PICKER_FAVORITES_LIMIT = 100;
 
-const ModelPickerModelSchema = z
-    .object({
-        provider: z.enum(LLM_PROVIDERS),
-        model: z.string().trim().min(1),
-        baseURL: z.string().trim().min(1).optional(),
-    })
-    .strict();
+const ModelPickerModelSchema = z.strictObject({
+    provider: z.enum(LLM_PROVIDERS),
+    model: z.string().trim().min(1),
+    baseURL: z.string().trim().min(1).optional(),
+});
 
-const ModelPickerEntrySchema = ModelPickerModelSchema.extend({
-    updatedAt: z.string().datetime(),
-}).strict();
+const ModelPickerEntrySchema = z.strictObject(
+    ModelPickerModelSchema.extend({
+        updatedAt: z.iso.datetime(),
+    }).shape
+);
 
-const ModelPickerStateSchema = z
-    .object({
-        version: z.literal(MODEL_PICKER_STATE_VERSION),
-        recents: z.array(ModelPickerEntrySchema).default([]),
-        favorites: z.array(ModelPickerEntrySchema).default([]),
-    })
-    .strict();
+const ModelPickerStateSchema = z.strictObject({
+    version: z.literal(MODEL_PICKER_STATE_VERSION),
+    recents: z.array(ModelPickerEntrySchema).default([]),
+    favorites: z.array(ModelPickerEntrySchema).default([]),
+});
 
-const SetFavoriteModelsInputSchema = z
-    .object({
-        favorites: z.array(ModelPickerModelSchema),
-    })
-    .strict();
+const SetFavoriteModelsInputSchema = z.strictObject({
+    favorites: z.array(ModelPickerModelSchema),
+});
 
 export type ModelPickerModel = z.output<typeof ModelPickerModelSchema>;
 export type ModelPickerEntry = z.output<typeof ModelPickerEntrySchema>;

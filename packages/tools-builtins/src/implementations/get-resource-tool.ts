@@ -2,23 +2,21 @@ import { z } from 'zod';
 import { ToolError, createLocalToolCallHeader, defineTool, truncateForHeader } from '@dexto/core';
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 
-const GetResourceInputSchema = z
-    .object({
-        reference: z
-            .string()
-            .describe(
-                'The resource reference to access. Formats: "blob:abc123" (from list_resources), ' +
-                    '"resource_ref:blob:abc123" (from tool annotations)'
-            ),
-        format: z
-            .enum(['url', 'metadata'])
-            .default('url')
-            .describe(
-                'Output format: "url" for a shareable URL (requires remote storage like Supabase), ' +
-                    '"metadata" for resource information without loading the data'
-            ),
-    })
-    .strict();
+const GetResourceInputSchema = z.strictObject({
+    reference: z
+        .string()
+        .describe(
+            'The resource reference to access. Formats: "blob:abc123" (from list_resources), ' +
+                '"resource_ref:blob:abc123" (from tool annotations)'
+        ),
+    format: z
+        .enum(['url', 'metadata'])
+        .default('url')
+        .describe(
+            'Output format: "url" for a shareable URL (requires remote storage like Supabase), ' +
+                '"metadata" for resource information without loading the data'
+        ),
+});
 
 /**
  * Create the `get_resource` tool.

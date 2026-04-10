@@ -13,42 +13,39 @@ import { TODO_STATUS_VALUES } from './types.js';
 /**
  * Zod schema for todo item input
  */
-const TodoItemSchema = z
-    .object({
-        content: z
-            .string()
-            .min(1)
-            .describe('Task description in imperative form (e.g., "Fix authentication bug")'),
-        activeForm: z
-            .string()
-            .min(1)
-            .describe(
-                'Present continuous form shown during execution (e.g., "Fixing authentication bug")'
-            ),
-        status: z
-            .enum(TODO_STATUS_VALUES)
-            .describe(
-                'Task status: pending (not started), in_progress (currently working), completed (finished)'
-            ),
-    })
-    .strict();
+const TodoItemSchema = z.strictObject({
+    content: z
+        .string()
+        .min(1)
+        .describe('Task description in imperative form (e.g., "Fix authentication bug")'),
+    activeForm: z
+        .string()
+        .min(1)
+        .describe(
+            'Present continuous form shown during execution (e.g., "Fixing authentication bug")'
+        ),
+    status: z
+        .enum(TODO_STATUS_VALUES)
+        .describe(
+            'Task status: pending (not started), in_progress (currently working), completed (finished)'
+        ),
+});
 
 /**
  * Zod schema for todo_write tool input
  */
 const TodoWriteInputSchema = z
-    .object({
+    .strictObject({
         todos: z
             .array(TodoItemSchema)
             .min(1)
             .describe('Array of todo items representing the complete task list for the session'),
     })
-    .strict()
     .superRefine((value, ctx) => {
         const inProgressCount = value.todos.filter((todo) => todo.status === 'in_progress').length;
         if (inProgressCount > 1) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 message: 'Only one todo may be in_progress at a time.',
                 path: ['todos'],
             });

@@ -11,15 +11,14 @@ const MAX_TAGS = 10;
 export const MemorySourceSchema = z.enum(['user', 'system']).describe('Source of the memory');
 
 export const MemoryMetadataSchema = z
-    .object({
+    .looseObject({
         source: MemorySourceSchema.optional().describe('Source of the memory'),
         pinned: z.boolean().optional().describe('Whether this memory is pinned for auto-loading'),
-    })
-    .passthrough() // Allow additional custom fields
+    }) // Allow additional custom fields
     .describe('Memory metadata');
 
 export const MemorySchema = z
-    .object({
+    .strictObject({
         id: z.string().min(1).describe('Unique identifier for the memory'),
         content: z
             .string()
@@ -29,8 +28,8 @@ export const MemorySchema = z
                 `Memory content cannot exceed ${MAX_CONTENT_LENGTH} characters`
             )
             .describe('The actual memory content'),
-        createdAt: z.number().int().positive().describe('Creation timestamp (Unix ms)'),
-        updatedAt: z.number().int().positive().describe('Last update timestamp (Unix ms)'),
+        createdAt: z.int().positive().describe('Creation timestamp (Unix ms)'),
+        updatedAt: z.int().positive().describe('Last update timestamp (Unix ms)'),
         tags: z
             .array(z.string().min(1).max(MAX_TAG_LENGTH))
             .max(MAX_TAGS)
@@ -38,11 +37,10 @@ export const MemorySchema = z
             .describe('Optional tags for categorization'),
         metadata: MemoryMetadataSchema.optional().describe('Additional metadata'),
     })
-    .strict()
     .describe('Memory item stored in the system');
 
 export const CreateMemoryInputSchema = z
-    .object({
+    .strictObject({
         content: z
             .string()
             .min(1, 'Memory content cannot be empty')
@@ -58,11 +56,10 @@ export const CreateMemoryInputSchema = z
             .describe('Optional tags'),
         metadata: MemoryMetadataSchema.optional().describe('Optional metadata'),
     })
-    .strict()
     .describe('Input for creating a new memory');
 
 export const UpdateMemoryInputSchema = z
-    .object({
+    .strictObject({
         content: z
             .string()
             .min(1, 'Memory content cannot be empty')
@@ -81,18 +78,16 @@ export const UpdateMemoryInputSchema = z
             'Updated metadata (merges with existing)'
         ),
     })
-    .strict()
     .describe('Input for updating an existing memory');
 
 export const ListMemoriesOptionsSchema = z
-    .object({
+    .strictObject({
         tags: z.array(z.string()).optional().describe('Filter by tags'),
         source: MemorySourceSchema.optional().describe('Filter by source'),
         pinned: z.boolean().optional().describe('Filter by pinned status'),
-        limit: z.number().int().positive().optional().describe('Limit number of results'),
-        offset: z.number().int().nonnegative().optional().describe('Skip first N results'),
+        limit: z.int().positive().optional().describe('Limit number of results'),
+        offset: z.int().nonnegative().optional().describe('Skip first N results'),
     })
-    .strict()
     .describe('Options for listing memories');
 
 /**
@@ -101,13 +96,12 @@ export const ListMemoriesOptionsSchema = z
  * are injected into the system prompt.
  */
 export const MemoriesConfigSchema = z
-    .object({
+    .strictObject({
         enabled: z
             .boolean()
             .default(false)
             .describe('Whether to include memories in system prompt (optional'),
         priority: z
-            .number()
             .int()
             .nonnegative()
             .default(40)
@@ -120,15 +114,9 @@ export const MemoriesConfigSchema = z
             .boolean()
             .default(true)
             .describe('Whether to include tags in memory display'),
-        limit: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .describe('Maximum number of memories to include'),
+        limit: z.int().positive().optional().describe('Maximum number of memories to include'),
         pinnedOnly: z.boolean().default(false).describe('Only include pinned memories'),
     })
-    .strict()
     .describe('Memory configuration for system prompt inclusion');
 
 export type ValidatedMemory = z.output<typeof MemorySchema>;

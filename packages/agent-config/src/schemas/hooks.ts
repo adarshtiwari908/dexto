@@ -12,11 +12,10 @@ import { z } from 'zod';
  * image factory's `configSchema`.
  */
 export const HookFactoryEntrySchema = z
-    .object({
+    .looseObject({
         type: z.string().describe('Hook factory type identifier'),
         enabled: z.boolean().optional().describe('If false, skip this hook entry entirely'),
     })
-    .passthrough()
     .describe(
         'Hook factory configuration. Additional fields are type-specific and validated by the resolver.'
     );

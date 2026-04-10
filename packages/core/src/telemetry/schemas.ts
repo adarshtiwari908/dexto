@@ -34,11 +34,11 @@ export const OtelConfigurationSchema = z.object({
                 protocol: z.enum(['grpc', 'http']).optional(),
                 endpoint: z
                     .union([
-                        z.string().url(),
+                        z.url(),
                         z.string().regex(/^[\w.-]+:\d+$/), // host:port
                     ])
                     .optional(),
-                headers: z.record(z.string()).optional(),
+                headers: z.record(z.string(), z.string()).optional(),
             }),
             z.object({
                 type: z.literal('console'),

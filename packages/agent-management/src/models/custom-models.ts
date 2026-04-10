@@ -45,10 +45,10 @@ export const CustomModelSchema = z
     .object({
         name: z.string().min(1),
         provider: z.enum(CUSTOM_MODEL_PROVIDERS).default('openai-compatible'),
-        baseURL: z.string().url().optional(),
+        baseURL: z.url().optional(),
         displayName: z.string().optional(),
-        maxInputTokens: z.number().int().positive().optional(),
-        maxOutputTokens: z.number().int().positive().optional(),
+        maxInputTokens: z.int().positive().optional(),
+        maxOutputTokens: z.int().positive().optional(),
         // Optional per-model API key. For openai-compatible this is the primary key source.
         // For litellm/glama/openrouter this overrides the provider-level env var key.
         apiKey: z.string().optional(),
@@ -56,11 +56,10 @@ export const CustomModelSchema = z
         // Stores the absolute path to the .gguf file on disk.
         filePath: z.string().optional(),
         reasoning: z
-            .object({
+            .strictObject({
                 variant: z.string().trim().min(1),
-                budgetTokens: z.number().int().positive().optional(),
+                budgetTokens: z.int().positive().optional(),
             })
-            .strict()
             .optional(),
     })
     .superRefine((data, ctx) => {
@@ -70,7 +69,7 @@ export const CustomModelSchema = z
             !data.baseURL
         ) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['baseURL'],
                 message: `Base URL is required for ${data.provider} provider`,
             });
@@ -78,7 +77,7 @@ export const CustomModelSchema = z
         // filePath is required for local provider
         if (data.provider === 'local' && !data.filePath) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['filePath'],
                 message: 'File path is required for local provider',
             });
@@ -86,7 +85,7 @@ export const CustomModelSchema = z
         // filePath must end with .gguf for local provider
         if (data.provider === 'local' && data.filePath && !data.filePath.endsWith('.gguf')) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['filePath'],
                 message: 'File path must be a .gguf file',
             });

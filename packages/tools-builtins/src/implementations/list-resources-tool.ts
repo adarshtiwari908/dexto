@@ -2,27 +2,25 @@ import { z } from 'zod';
 import { ToolError, createLocalToolCallHeader, defineTool } from '@dexto/core';
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 
-const ListResourcesInputSchema = z
-    .object({
-        source: z
-            .enum(['all', 'tool', 'user'])
-            .optional()
-            .default('all')
-            .describe(
-                'Filter by source: "tool" for tool-generated resources, "user" for user-uploaded, "all" for both'
-            ),
-        kind: z
-            .enum(['all', 'image', 'audio', 'video', 'binary'])
-            .optional()
-            .default('all')
-            .describe('Filter by type: "image", "audio", "video", "binary", or "all"'),
-        limit: z
-            .number()
-            .optional()
-            .default(50)
-            .describe('Maximum number of resources to return (default: 50)'),
-    })
-    .strict();
+const ListResourcesInputSchema = z.strictObject({
+    source: z
+        .enum(['all', 'tool', 'user'])
+        .optional()
+        .default('all')
+        .describe(
+            'Filter by source: "tool" for tool-generated resources, "user" for user-uploaded, "all" for both'
+        ),
+    kind: z
+        .enum(['all', 'image', 'audio', 'video', 'binary'])
+        .optional()
+        .default('all')
+        .describe('Filter by type: "image", "audio", "video", "binary", or "all"'),
+    limit: z
+        .number()
+        .optional()
+        .default(50)
+        .describe('Maximum number of resources to return (default: 50)'),
+});
 
 interface ResourceInfo {
     reference: string;

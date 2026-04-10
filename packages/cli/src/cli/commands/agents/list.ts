@@ -14,13 +14,11 @@ import {
 import { getProviderDisplayName } from '../../utils/provider-setup.js';
 
 // Zod schema for list-agents command validation
-const ListAgentsCommandSchema = z
-    .object({
-        verbose: z.boolean().default(false),
-        installed: z.boolean().default(false),
-        available: z.boolean().default(false),
-    })
-    .strict();
+const ListAgentsCommandSchema = z.strictObject({
+    verbose: z.boolean().default(false),
+    installed: z.boolean().default(false),
+    available: z.boolean().default(false),
+});
 
 export type ListAgentsCommandOptions = z.output<typeof ListAgentsCommandSchema>;
 export type ListAgentsCommandOptionsInput = z.input<typeof ListAgentsCommandSchema>;

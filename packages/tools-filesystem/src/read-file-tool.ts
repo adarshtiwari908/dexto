@@ -10,23 +10,11 @@ import type { FileDisplayData, Tool, ToolExecutionContext } from '@dexto/core';
 import type { FileSystemServiceGetter } from './file-tool-types.js';
 import { createDirectoryAccessApprovalHandlers, resolveFilePath } from './directory-approval.js';
 
-const ReadFileInputSchema = z
-    .object({
-        file_path: z.string().min(1).describe('Absolute path to the file to read'),
-        limit: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .describe('Maximum number of lines to read (optional)'),
-        offset: z
-            .number()
-            .int()
-            .min(1)
-            .optional()
-            .describe('Starting line number (1-based, optional)'),
-    })
-    .strict();
+const ReadFileInputSchema = z.strictObject({
+    file_path: z.string().min(1).describe('Absolute path to the file to read'),
+    limit: z.int().positive().optional().describe('Maximum number of lines to read (optional)'),
+    offset: z.int().min(1).optional().describe('Starting line number (1-based, optional)'),
+});
 
 /**
  * Create the read_file internal tool with directory approval support

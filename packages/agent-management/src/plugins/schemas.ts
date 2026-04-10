@@ -23,13 +23,12 @@ const AuthorSchema = z.union([
  * Uses passthrough to allow unknown fields from Claude Code plugins
  */
 export const PluginManifestSchema = z
-    .object({
+    .looseObject({
         name: z.string().min(1).describe('Unique plugin name (used for namespacing commands)'),
         description: z.string().optional().describe('Human-readable plugin description'),
         version: z.string().optional().describe('Semantic version (e.g., 1.0.0)'),
         author: AuthorSchema.optional().describe('Plugin author - string or {name, email} object'),
     })
-    .passthrough()
     .describe('Claude Code plugin manifest from .claude-plugin/plugin.json');
 
 /**
@@ -37,10 +36,12 @@ export const PluginManifestSchema = z
  * Uses passthrough to allow unknown MCP server configurations
  */
 export const PluginMCPConfigSchema = z
-    .object({
-        mcpServers: z.record(z.unknown()).optional().describe('MCP servers to register'),
+    .looseObject({
+        mcpServers: z
+            .record(z.string(), z.unknown())
+            .optional()
+            .describe('MCP servers to register'),
     })
-    .passthrough()
     .describe('MCP configuration from .mcp.json');
 
 /**
@@ -57,7 +58,7 @@ export type ValidatedPluginMCPConfig = z.output<typeof PluginMCPConfigSchema>;
  * Schema for individual plugin installation entry in installed_plugins.json
  */
 export const InstalledPluginEntrySchema = z
-    .object({
+    .looseObject({
         scope: z.enum(['project', 'user', 'local']).describe('Installation scope'),
         installPath: z.string().describe('Absolute path to the installed plugin'),
         version: z.string().optional().describe('Plugin version'),
@@ -70,20 +71,18 @@ export const InstalledPluginEntrySchema = z
         projectPath: z.string().optional().describe('Project path for project-scoped plugins'),
         isLocal: z.boolean().optional().describe('Whether this is a local plugin'),
     })
-    .passthrough()
     .describe('Plugin installation entry');
 
 /**
  * Schema for ~/.dexto/plugins/installed_plugins.json
  */
 export const InstalledPluginsFileSchema = z
-    .object({
+    .looseObject({
         version: z.number().optional().describe('Schema version'),
         plugins: z
-            .record(z.array(InstalledPluginEntrySchema))
+            .record(z.string(), z.array(InstalledPluginEntrySchema))
             .describe('Map of plugin identifiers to installation entries'),
     })
-    .passthrough()
     .describe('Claude Code installed plugins manifest');
 
 /**

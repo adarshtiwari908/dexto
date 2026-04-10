@@ -6,26 +6,22 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import { z } from 'zod';
 import { getDextoGlobalPath } from '../utils/path.js';
 
-const ImageRegistryFileSchema = z
-    .object({
-        version: z.literal(1),
-        images: z.record(
-            z
-                .object({
-                    active: z.string().optional(),
-                    installed: z.record(
-                        z
-                            .object({
-                                entryFile: z.string(),
-                                installedAt: z.string(),
-                            })
-                            .strict()
-                    ),
+const ImageRegistryFileSchema = z.strictObject({
+    version: z.literal(1),
+    images: z.record(
+        z.string(),
+        z.strictObject({
+            active: z.string().optional(),
+            installed: z.record(
+                z.string(),
+                z.strictObject({
+                    entryFile: z.string(),
+                    installedAt: z.string(),
                 })
-                .strict()
-        ),
-    })
-    .strict();
+            ),
+        })
+    ),
+});
 
 export type ImageRegistryFile = z.output<typeof ImageRegistryFileSchema>;
 

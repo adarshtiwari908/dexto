@@ -10,20 +10,16 @@ const DEPLOY_LOCK_RETRY_MS = 25;
 const DEPLOY_LOCK_TIMEOUT_MS = 5_000;
 const DEPLOY_LOCK_STALE_MS = DEPLOY_LOCK_TIMEOUT_MS;
 
-const DeployLinkSchema = z
-    .object({
-        cloudAgentId: z.string().trim().min(1),
-        agentUrl: z.string().trim().min(1).optional(),
-        updatedAt: z.string().datetime(),
-    })
-    .strict();
+const DeployLinkSchema = z.strictObject({
+    cloudAgentId: z.string().trim().min(1),
+    agentUrl: z.string().trim().min(1).optional(),
+    updatedAt: z.iso.datetime(),
+});
 
-const DeployStateSchema = z
-    .object({
-        version: z.literal(1).default(1),
-        links: z.record(z.string(), DeployLinkSchema).default({}),
-    })
-    .strict();
+const DeployStateSchema = z.strictObject({
+    version: z.literal(1).default(1),
+    links: z.record(z.string(), DeployLinkSchema).default({}),
+});
 
 export type DeployLink = z.output<typeof DeployLinkSchema>;
 type DeployLinkInput = Pick<z.input<typeof DeployLinkSchema>, 'cloudAgentId' | 'agentUrl'>;

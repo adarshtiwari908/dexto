@@ -1148,7 +1148,7 @@ export function validateModelFileSupport(
  * TODO: make more readable
  */
 export function getEffectiveMaxInputTokens(config: LLMConfig, logger: Logger): number {
-    const configuredMaxInputTokens = config.maxInputTokens;
+    const configuredMaxInputTokens = config.maxInputTokens as number | undefined;
 
     // Priority 1: Explicit config override or required value with baseURL
     if (configuredMaxInputTokens != null) {

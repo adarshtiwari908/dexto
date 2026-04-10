@@ -100,23 +100,19 @@ function resolveImageMetadata(defaultName: string): { name: string; version: str
 
 const imageMetadata = resolveImageMetadata('@dexto/image-local');
 
-const contentPolicyConfigSchema = z
-    .object({
-        type: z.literal('content-policy'),
-        maxInputChars: z.number().int().positive().optional(),
-        redactEmails: z.boolean().optional(),
-        redactApiKeys: z.boolean().optional(),
-    })
-    .strict();
+const contentPolicyConfigSchema = z.strictObject({
+    type: z.literal('content-policy'),
+    maxInputChars: z.int().positive().optional(),
+    redactEmails: z.boolean().optional(),
+    redactApiKeys: z.boolean().optional(),
+});
 
-const responseSanitizerConfigSchema = z
-    .object({
-        type: z.literal('response-sanitizer'),
-        redactEmails: z.boolean().optional(),
-        redactApiKeys: z.boolean().optional(),
-        maxResponseLength: z.number().int().positive().optional(),
-    })
-    .strict();
+const responseSanitizerConfigSchema = z.strictObject({
+    type: z.literal('response-sanitizer'),
+    redactEmails: z.boolean().optional(),
+    redactApiKeys: z.boolean().optional(),
+    maxResponseLength: z.int().positive().optional(),
+});
 
 const contentPolicyFactory: HookFactory<z.output<typeof contentPolicyConfigSchema>> = {
     configSchema: contentPolicyConfigSchema,

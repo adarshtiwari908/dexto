@@ -67,13 +67,11 @@ function resolveImageMetadata(defaultName: string): { name: string; version: str
 
 const imageMetadata = resolveImageMetadata('@dexto/image-logger-agent');
 
-const requestLoggerConfigSchema = z
-    .object({
-        type: z.literal('request-logger'),
-        logDir: z.string().optional(),
-        logFileName: z.string().optional(),
-    })
-    .strict();
+const requestLoggerConfigSchema = z.strictObject({
+    type: z.literal('request-logger'),
+    logDir: z.string().optional(),
+    logFileName: z.string().optional(),
+});
 
 const requestLoggerFactory: HookFactory<z.output<typeof requestLoggerConfigSchema>> = {
     configSchema: requestLoggerConfigSchema,

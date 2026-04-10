@@ -16,7 +16,7 @@ import type { Tool } from '@dexto/core';
  * Input schema for wait_for tool
  */
 export const WaitForInputSchema = z
-    .object({
+    .strictObject({
         /** Wait for a single task */
         taskId: z.string().optional().describe('Task ID to wait for'),
 
@@ -33,11 +33,12 @@ export const WaitForInputSchema = z
         /** Timeout in milliseconds */
         timeout: z.number().positive().optional().describe('Maximum time to wait in milliseconds'),
     })
-    .strict()
     .refine(
         (data) =>
             data.taskId !== undefined || (data.taskIds !== undefined && data.taskIds.length > 0),
-        { message: 'Either taskId or taskIds must be provided' }
+        {
+            error: 'Either taskId or taskIds must be provided',
+        }
     );
 
 export type WaitForInput = z.output<typeof WaitForInputSchema>;

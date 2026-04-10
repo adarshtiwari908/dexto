@@ -11,31 +11,27 @@ export function deriveDisplayName(slug: string): string {
 /**
  * Schema for agent data in registry JSON
  */
-export const AgentRegistryEntrySchema = z
-    .object({
-        id: z.string().describe('Unique identifier for the agent'),
-        name: z.string().describe('Display name for the agent'),
-        description: z.string(),
-        author: z.string(),
-        tags: z.array(z.string()),
-        source: z.string(),
-        main: z.string().optional(),
-        enabled: z.boolean().optional(),
-        type: z.enum(['builtin', 'custom']).default('builtin').describe('Agent type'),
-    })
-    .strict();
+export const AgentRegistryEntrySchema = z.strictObject({
+    id: z.string().describe('Unique identifier for the agent'),
+    name: z.string().describe('Display name for the agent'),
+    description: z.string(),
+    author: z.string(),
+    tags: z.array(z.string()),
+    source: z.string(),
+    main: z.string().optional(),
+    enabled: z.boolean().optional(),
+    type: z.enum(['builtin', 'custom']).default('builtin').describe('Agent type'),
+});
 
 export type AgentRegistryEntry = z.output<typeof AgentRegistryEntrySchema>;
 
 /**
  * Schema for complete registry JSON
  */
-export const RegistrySchema = z
-    .object({
-        version: z.string(),
-        agents: z.record(z.string(), AgentRegistryEntrySchema),
-    })
-    .strict();
+export const RegistrySchema = z.strictObject({
+    version: z.string(),
+    agents: z.record(z.string(), AgentRegistryEntrySchema),
+});
 
 export type Registry = z.output<typeof RegistrySchema>;
 

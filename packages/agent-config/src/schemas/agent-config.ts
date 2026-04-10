@@ -33,11 +33,10 @@ import { CompactionConfigSchema, DEFAULT_COMPACTION_CONFIG } from './compaction.
  * `configSchema`.
  */
 export const ToolFactoryEntrySchema = z
-    .object({
+    .looseObject({
         type: z.string().describe('Tool factory type identifier'),
         enabled: z.boolean().optional().describe('If false, skip this tool factory entry entirely'),
     })
-    .passthrough()
     .describe(
         'Tool factory configuration. Additional fields are type-specific and validated by the resolver.'
     );
@@ -53,7 +52,7 @@ export type ToolFactoryEntry = z.output<typeof ToolFactoryEntrySchema>;
  */
 export function createAgentConfigSchema() {
     return z
-        .object({
+        .strictObject({
             // ========================================
             // REQUIRED FIELDS (user must provide or schema validation fails)
             // ========================================
@@ -83,7 +82,7 @@ export function createAgentConfigSchema() {
             ).optional(),
 
             agentFile: z
-                .object({
+                .strictObject({
                     discoverInCwd: z
                         .boolean()
                         .default(true)
@@ -91,7 +90,6 @@ export function createAgentConfigSchema() {
                             'Whether to discover AGENTS.md/CLAUDE.md/GEMINI.md in the current working directory and include it in the system prompt'
                         ),
                 })
-                .strict()
                 .default({})
                 .describe('Agent instruction file discovery configuration'),
 
@@ -164,7 +162,6 @@ export function createAgentConfigSchema() {
                 DEFAULT_COMPACTION_CONFIG
             ),
         })
-        .strict()
         .describe('Main configuration for an agent, including its LLM and server connections')
         .brand<'ValidatedAgentConfig'>();
 }

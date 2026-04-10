@@ -35,20 +35,16 @@ function computeContentHash(content: string): string {
     return createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
-const EditFileInputSchema = z
-    .object({
-        file_path: z.string().min(1).describe('Absolute path to the file to edit'),
-        old_string: z
-            .string()
-            .describe('Text to replace (must be unique unless replace_all is true)'),
-        new_string: z.string().describe('Replacement text'),
-        replace_all: z
-            .boolean()
-            .optional()
-            .default(false)
-            .describe('Replace all occurrences (default: false, requires unique match)'),
-    })
-    .strict();
+const EditFileInputSchema = z.strictObject({
+    file_path: z.string().min(1).describe('Absolute path to the file to edit'),
+    old_string: z.string().describe('Text to replace (must be unique unless replace_all is true)'),
+    new_string: z.string().describe('Replacement text'),
+    replace_all: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe('Replace all occurrences (default: false, requires unique match)'),
+});
 
 /**
  * Generate diff preview without modifying the file

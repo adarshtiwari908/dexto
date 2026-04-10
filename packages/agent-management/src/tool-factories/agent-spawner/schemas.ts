@@ -18,13 +18,12 @@ export const DEFAULT_SUB_AGENT_REASONING_VARIANT: ReasoningVariant = 'disabled';
  * Configuration schema for the agent spawner tools factory.
  */
 export const AgentSpawnerConfigSchema = z
-    .object({
+    .strictObject({
         /** Type discriminator for the factory */
         type: z.literal('agent-spawner'),
 
         /** Maximum concurrent sub-agents this parent can spawn (default: 5) */
         maxConcurrentAgents: z
-            .number()
             .int()
             .positive()
             .default(5)
@@ -32,14 +31,12 @@ export const AgentSpawnerConfigSchema = z
 
         /** Default timeout for task execution in milliseconds (default: 3600000 = 1 hour) */
         defaultTimeout: z
-            .number()
             .int()
             .nonnegative()
             .default(3_600_000)
             .describe('Default task timeout in milliseconds (0 = no timeout)'),
 
         subAgentMaxIterations: z
-            .number()
             .int()
             .positive()
             .default(DEFAULT_SUB_AGENT_MAX_ITERATIONS)
@@ -97,7 +94,6 @@ export const AgentSpawnerConfigSchema = z
             .optional()
             .describe('Agent IDs that should have tools auto-approved (read-only agents)'),
     })
-    .strict()
     .describe('Configuration for the agent spawner tools factory');
 
 export type AgentSpawnerConfig = z.output<typeof AgentSpawnerConfigSchema>;
@@ -112,20 +108,15 @@ export type AgentSpawnerConfig = z.output<typeof AgentSpawnerConfigSchema>;
  * Note: Timeout is configured at the provider level (defaultTimeout in config).
  * We don't expose timeout as a tool parameter because lowering it just wastes runs.
  */
-export const SpawnAgentInputSchema = z
-    .object({
-        /** Short task description (shown in UI/logs) */
-        task: z.string().min(1).describe('Short task description for UI/logs'),
+export const SpawnAgentInputSchema = z.strictObject({
+    /** Short task description (shown in UI/logs) */
+    task: z.string().min(1).describe('Short task description for UI/logs'),
 
-        /** Detailed instructions for the sub-agent */
-        instructions: z
-            .string()
-            .min(1)
-            .describe('Detailed instructions for the sub-agent to execute'),
+    /** Detailed instructions for the sub-agent */
+    instructions: z.string().min(1).describe('Detailed instructions for the sub-agent to execute'),
 
-        /** Agent ID from registry (optional - uses default minimal agent if not provided) */
-        agentId: z.string().min(1).optional().describe('Agent ID from registry'),
-    })
-    .strict();
+    /** Agent ID from registry (optional - uses default minimal agent if not provided) */
+    agentId: z.string().min(1).optional().describe('Agent ID from registry'),
+});
 
 export type SpawnAgentInput = z.output<typeof SpawnAgentInputSchema>;

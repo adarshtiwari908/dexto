@@ -22,25 +22,19 @@ import {
 } from '@dexto/agent-management';
 import { installImageToStore } from '../utils/image-store.js';
 
-const ImageInstallCommandSchema = z
-    .object({
-        image: z.string().min(1),
-        force: z.boolean().default(false),
-        activate: z.boolean().default(true),
-    })
-    .strict();
+const ImageInstallCommandSchema = z.strictObject({
+    image: z.string().min(1),
+    force: z.boolean().default(false),
+    activate: z.boolean().default(true),
+});
 
-const ImageUseCommandSchema = z
-    .object({
-        image: z.string().min(1),
-    })
-    .strict();
+const ImageUseCommandSchema = z.strictObject({
+    image: z.string().min(1),
+});
 
-const ImageRemoveCommandSchema = z
-    .object({
-        image: z.string().min(1),
-    })
-    .strict();
+const ImageRemoveCommandSchema = z.strictObject({
+    image: z.string().min(1),
+});
 
 export type ImageInstallCommandOptions = z.output<typeof ImageInstallCommandSchema>;
 export type ImageInstallCommandOptionsInput = z.input<typeof ImageInstallCommandSchema>;

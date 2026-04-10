@@ -21,22 +21,19 @@ export const DEFAULT_TASK_TIMEOUT = 300000; // 5 minutes
  * Schema for AgentRuntime configuration
  */
 export const AgentRuntimeConfigSchema = z
-    .object({
+    .strictObject({
         maxAgents: z
-            .number()
             .int()
             .positive()
             .default(DEFAULT_MAX_AGENTS)
             .describe('Maximum total agents managed by this runtime'),
 
         defaultTaskTimeout: z
-            .number()
             .int()
             .nonnegative()
             .default(DEFAULT_TASK_TIMEOUT)
             .describe('Default task timeout in milliseconds (0 = no timeout)'),
     })
-    .strict()
     .describe('Configuration for the AgentRuntime');
 
 export type ValidatedAgentRuntimeConfig = z.output<typeof AgentRuntimeConfigSchema>;
@@ -50,8 +47,8 @@ export type ValidatedAgentRuntimeConfig = z.output<typeof AgentRuntimeConfigSche
  * Note: agentConfig is not validated here as it uses the agent-config AgentConfigSchema
  */
 export const SpawnConfigSchema = z
-    .object({
-        agentConfig: z.record(z.unknown()).describe('Base agent configuration'),
+    .strictObject({
+        agentConfig: z.record(z.string(), z.unknown()).describe('Base agent configuration'),
 
         ephemeral: z
             .boolean()
@@ -71,11 +68,10 @@ export const SpawnConfigSchema = z
             .describe('Optional group identifier for logical grouping'),
 
         metadata: z
-            .record(z.unknown())
+            .record(z.string(), z.unknown())
             .optional()
             .describe('Optional metadata for tracking relationships or context'),
     })
-    .strict()
     .describe('Configuration for spawning an agent');
 
 export type ValidatedSpawnConfig = z.output<typeof SpawnConfigSchema>;
@@ -106,7 +102,7 @@ export type ValidatedAgentStatus = z.output<typeof AgentStatusSchema>;
  * Schema for AgentFilter
  */
 export const AgentFilterSchema = z
-    .object({
+    .strictObject({
         group: z.string().optional().describe('Filter by group'),
 
         status: z
@@ -116,7 +112,6 @@ export const AgentFilterSchema = z
 
         ephemeral: z.boolean().optional().describe('Filter by ephemeral flag'),
     })
-    .strict()
     .describe('Filter options for listing agents');
 
 export type ValidatedAgentFilter = z.output<typeof AgentFilterSchema>;

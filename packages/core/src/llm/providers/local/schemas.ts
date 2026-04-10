@@ -59,141 +59,123 @@ export const ModelDownloadStatusSchema = z.enum([
 /**
  * Schema for local model info (registry entry).
  */
-export const LocalModelInfoSchema = z
-    .object({
-        id: z.string().min(1).describe('Unique model identifier'),
-        name: z.string().min(1).describe('Human-readable display name'),
-        description: z.string().describe('Short description of model capabilities'),
-        huggingfaceId: z.string().min(1).describe('HuggingFace repository ID'),
-        filename: z.string().min(1).describe('GGUF filename to download'),
-        quantization: QuantizationTypeSchema.describe('Quantization level'),
-        sizeBytes: z.number().int().positive().describe('File size in bytes'),
-        contextLength: z.number().int().positive().describe('Maximum context window'),
-        categories: z.array(LocalModelCategorySchema).describe('Model categories'),
-        minVRAM: z.number().positive().optional().describe('Minimum VRAM in GB'),
-        minRAM: z.number().positive().optional().describe('Minimum RAM in GB'),
-        recommended: z.boolean().optional().describe('Whether model is featured'),
-        author: z.string().optional().describe('Model author/organization'),
-        license: z.string().optional().describe('License type'),
-        supportsVision: z.boolean().optional().describe('Whether model supports images'),
-        supportsTools: z.boolean().optional().describe('Whether model supports function calling'),
-    })
-    .strict();
+export const LocalModelInfoSchema = z.strictObject({
+    id: z.string().min(1).describe('Unique model identifier'),
+    name: z.string().min(1).describe('Human-readable display name'),
+    description: z.string().describe('Short description of model capabilities'),
+    huggingfaceId: z.string().min(1).describe('HuggingFace repository ID'),
+    filename: z.string().min(1).describe('GGUF filename to download'),
+    quantization: QuantizationTypeSchema.describe('Quantization level'),
+    sizeBytes: z.int().positive().describe('File size in bytes'),
+    contextLength: z.int().positive().describe('Maximum context window'),
+    categories: z.array(LocalModelCategorySchema).describe('Model categories'),
+    minVRAM: z.number().positive().optional().describe('Minimum VRAM in GB'),
+    minRAM: z.number().positive().optional().describe('Minimum RAM in GB'),
+    recommended: z.boolean().optional().describe('Whether model is featured'),
+    author: z.string().optional().describe('Model author/organization'),
+    license: z.string().optional().describe('License type'),
+    supportsVision: z.boolean().optional().describe('Whether model supports images'),
+    supportsTools: z.boolean().optional().describe('Whether model supports function calling'),
+});
 
 /**
  * Schema for model download progress.
  */
-export const ModelDownloadProgressSchema = z
-    .object({
-        modelId: z.string().min(1),
-        status: ModelDownloadStatusSchema,
-        bytesDownloaded: z.number().int().nonnegative(),
-        totalBytes: z.number().int().nonnegative(),
-        percentage: z.number().min(0).max(100),
-        speed: z.number().nonnegative().optional(),
-        eta: z.number().nonnegative().optional(),
-        error: z.string().optional(),
-    })
-    .strict();
+export const ModelDownloadProgressSchema = z.strictObject({
+    modelId: z.string().min(1),
+    status: ModelDownloadStatusSchema,
+    bytesDownloaded: z.int().nonnegative(),
+    totalBytes: z.int().nonnegative(),
+    percentage: z.number().min(0).max(100),
+    speed: z.number().nonnegative().optional(),
+    eta: z.number().nonnegative().optional(),
+    error: z.string().optional(),
+});
 
 /**
  * Schema for GPU info.
  */
-export const GPUInfoSchema = z
-    .object({
-        backend: GPUBackendSchema,
-        available: z.boolean(),
-        deviceName: z.string().optional(),
-        vramMB: z.number().int().nonnegative().optional(),
-        driverVersion: z.string().optional(),
-    })
-    .strict();
+export const GPUInfoSchema = z.strictObject({
+    backend: GPUBackendSchema,
+    available: z.boolean(),
+    deviceName: z.string().optional(),
+    vramMB: z.int().nonnegative().optional(),
+    driverVersion: z.string().optional(),
+});
 
 /**
  * Schema for local LLM configuration.
  */
-export const LocalLLMConfigSchema = z
-    .object({
-        provider: z.enum(['local', 'ollama']),
-        model: z.string().min(1).describe('Model ID or GGUF path'),
-        gpuLayers: z.number().int().optional().describe('GPU layers (-1=auto, 0=CPU)'),
-        contextSize: z.number().int().positive().optional().describe('Override context size'),
-        threads: z.number().int().positive().optional().describe('CPU threads'),
-        batchSize: z.number().int().positive().optional().describe('Inference batch size'),
-        modelPath: z.string().optional().describe('Resolved path to model file'),
-    })
-    .strict();
+export const LocalLLMConfigSchema = z.strictObject({
+    provider: z.enum(['local', 'ollama']),
+    model: z.string().min(1).describe('Model ID or GGUF path'),
+    gpuLayers: z.int().optional().describe('GPU layers (-1=auto, 0=CPU)'),
+    contextSize: z.int().positive().optional().describe('Override context size'),
+    threads: z.int().positive().optional().describe('CPU threads'),
+    batchSize: z.int().positive().optional().describe('Inference batch size'),
+    modelPath: z.string().optional().describe('Resolved path to model file'),
+});
 
 /**
  * Schema for installed model metadata.
  */
-export const InstalledModelSchema = z
-    .object({
-        id: z.string().min(1),
-        filePath: z.string().min(1),
-        sizeBytes: z.number().int().positive(),
-        downloadedAt: z.string().datetime(),
-        lastUsedAt: z.string().datetime().optional(),
-        sha256: z.string().optional(),
-        source: ModelSourceSchema,
-    })
-    .strict();
+export const InstalledModelSchema = z.strictObject({
+    id: z.string().min(1),
+    filePath: z.string().min(1),
+    sizeBytes: z.int().positive(),
+    downloadedAt: z.iso.datetime(),
+    lastUsedAt: z.iso.datetime().optional(),
+    sha256: z.string().optional(),
+    source: ModelSourceSchema,
+});
 
 /**
  * Schema for model state (persisted state file).
  */
-export const ModelStateSchema = z
-    .object({
-        version: z.string().default('1.0'),
-        installed: z.record(z.string(), InstalledModelSchema).default({}),
-        activeModelId: z.string().optional(),
-        downloadQueue: z.array(z.string()).default([]),
-    })
-    .strict();
+export const ModelStateSchema = z.strictObject({
+    version: z.string().default('1.0'),
+    installed: z.record(z.string(), InstalledModelSchema).default({}),
+    activeModelId: z.string().optional(),
+    downloadQueue: z.array(z.string()).default([]),
+});
 
 /**
  * Schema for model download options.
  */
-export const ModelDownloadOptionsSchema = z
-    .object({
-        modelId: z.string().min(1),
-        outputDir: z.string().optional(),
-        showProgress: z.boolean().default(true),
-        hfToken: z.string().optional(),
-    })
-    .strict();
+export const ModelDownloadOptionsSchema = z.strictObject({
+    modelId: z.string().min(1),
+    outputDir: z.string().optional(),
+    showProgress: z.boolean().default(true),
+    hfToken: z.string().optional(),
+});
 
 /**
  * Schema for Ollama model info (from API).
  */
-export const OllamaModelInfoSchema = z
-    .object({
-        name: z.string().min(1),
-        size: z.number().int().nonnegative(),
-        digest: z.string(),
-        modifiedAt: z.string(),
-        details: z
-            .object({
-                family: z.string().optional(),
-                parameterSize: z.string().optional(),
-                quantizationLevel: z.string().optional(),
-            })
-            .optional(),
-    })
-    .strict();
+export const OllamaModelInfoSchema = z.strictObject({
+    name: z.string().min(1),
+    size: z.int().nonnegative(),
+    digest: z.string(),
+    modifiedAt: z.string(),
+    details: z
+        .object({
+            family: z.string().optional(),
+            parameterSize: z.string().optional(),
+            quantizationLevel: z.string().optional(),
+        })
+        .optional(),
+});
 
 /**
  * Schema for Ollama server status.
  */
-export const OllamaStatusSchema = z
-    .object({
-        running: z.boolean(),
-        url: z.string().url(),
-        version: z.string().optional(),
-        models: z.array(OllamaModelInfoSchema).optional(),
-        error: z.string().optional(),
-    })
-    .strict();
+export const OllamaStatusSchema = z.strictObject({
+    running: z.boolean(),
+    url: z.url(),
+    version: z.string().optional(),
+    models: z.array(OllamaModelInfoSchema).optional(),
+    error: z.string().optional(),
+});
 
 // Export inferred types for convenience
 export type LocalModelInfoInput = z.input<typeof LocalModelInfoSchema>;

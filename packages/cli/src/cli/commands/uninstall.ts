@@ -11,12 +11,10 @@ import {
     scheduleDeferredWindowsRemoval,
 } from '../utils/self-management.js';
 
-const UninstallCliCommandSchema = z
-    .object({
-        purge: z.boolean().default(false),
-        dryRun: z.boolean().default(false),
-    })
-    .strict();
+const UninstallCliCommandSchema = z.strictObject({
+    purge: z.boolean().default(false),
+    dryRun: z.boolean().default(false),
+});
 
 export type UninstallCliCommandOptions = z.output<typeof UninstallCliCommandSchema>;
 

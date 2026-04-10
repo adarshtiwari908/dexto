@@ -4,17 +4,16 @@ import { z } from 'zod';
  * Converts a JSON Schema object to a Zod raw shape.
  * This is a simplified converter that handles common MCP tool schemas.
  */
-export function jsonSchemaToZodShape(jsonSchema: any): z.ZodRawShape {
+export function jsonSchemaToZodShape(jsonSchema: any): Record<string, z.ZodType> {
     if (!jsonSchema || typeof jsonSchema !== 'object' || jsonSchema.type !== 'object') {
         return {};
     }
 
-    const shape: z.ZodRawShape = {};
-
+    const shape: Record<string, z.ZodType> = {};
     if (jsonSchema.properties) {
         for (const [key, property] of Object.entries(jsonSchema.properties)) {
             const propSchema = property as any;
-            let zodType: z.ZodTypeAny;
+            let zodType: z.ZodType;
             switch (propSchema.type) {
                 case 'string':
                     zodType = z.string();
@@ -23,7 +22,7 @@ export function jsonSchemaToZodShape(jsonSchema: any): z.ZodRawShape {
                     zodType = z.number();
                     break;
                 case 'integer':
-                    zodType = z.number().int();
+                    zodType = z.int();
                     break;
                 case 'boolean':
                     zodType = z.boolean();
@@ -65,8 +64,8 @@ export function jsonSchemaToZodShape(jsonSchema: any): z.ZodRawShape {
 /**
  * Helper function to get a Zod type from a property schema
  */
-export function getZodTypeFromProperty(propSchema: any): z.ZodTypeAny {
-    let zodType: z.ZodTypeAny;
+export function getZodTypeFromProperty(propSchema: any): z.ZodType {
+    let zodType: z.ZodType;
 
     switch (propSchema.type) {
         case 'string':
@@ -76,7 +75,7 @@ export function getZodTypeFromProperty(propSchema: any): z.ZodTypeAny {
             zodType = z.number();
             break;
         case 'integer':
-            zodType = z.number().int();
+            zodType = z.int();
             break;
         case 'boolean':
             zodType = z.boolean();

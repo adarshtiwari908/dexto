@@ -17,31 +17,28 @@ import {
     generateCommandPatternSuggestions,
 } from './command-pattern-utils.js';
 
-const BashExecInputSchema = z
-    .object({
-        command: z.string().min(1).describe('Shell command to execute'),
-        description: z
-            .string()
-            .optional()
-            .describe('Human-readable description of what the command does (5-10 words)'),
-        timeout: z
-            .number()
-            .int()
-            .positive()
-            .max(600000)
-            .optional()
-            .default(120000)
-            .describe(
-                'Timeout in milliseconds (max: 600000 = 10 minutes, default: 120000 = 2 minutes)'
-            ),
-        run_in_background: z
-            .boolean()
-            .optional()
-            .default(false)
-            .describe('Execute command in background (default: false)'),
-        cwd: z.string().optional().describe('Working directory for command execution (optional)'),
-    })
-    .strict();
+const BashExecInputSchema = z.strictObject({
+    command: z.string().min(1).describe('Shell command to execute'),
+    description: z
+        .string()
+        .optional()
+        .describe('Human-readable description of what the command does (5-10 words)'),
+    timeout: z
+        .int()
+        .positive()
+        .max(600000)
+        .optional()
+        .default(120000)
+        .describe(
+            'Timeout in milliseconds (max: 600000 = 10 minutes, default: 120000 = 2 minutes)'
+        ),
+    run_in_background: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe('Execute command in background (default: false)'),
+    cwd: z.string().optional().describe('Working directory for command execution (optional)'),
+});
 
 /**
  * Create the bash_exec internal tool

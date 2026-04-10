@@ -13,34 +13,31 @@ import { isIP } from 'node:net';
 import { TextDecoder } from 'node:util';
 import { Agent, type Dispatcher } from 'undici';
 
-const HttpRequestInputSchema = z
-    .object({
-        url: z.string().url().describe('Absolute URL to request'),
-        method: z
-            .enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-            .default('GET')
-            .describe('HTTP method to use'),
-        headers: z
-            .record(z.string())
-            .optional()
-            .describe('Optional request headers (string values only)'),
-        query: z
-            .record(z.string())
-            .optional()
-            .describe('Optional query parameters to append to the URL'),
-        body: z
-            .union([z.string(), z.record(z.unknown()), z.array(z.unknown())])
-            .optional()
-            .describe('Optional request body (string or JSON-serializable value)'),
-        timeoutMs: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(30000)
-            .describe('Request timeout in milliseconds (default: 30000)'),
-    })
-    .strict();
+const HttpRequestInputSchema = z.strictObject({
+    url: z.url().describe('Absolute URL to request'),
+    method: z
+        .enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
+        .default('GET')
+        .describe('HTTP method to use'),
+    headers: z
+        .record(z.string(), z.string())
+        .optional()
+        .describe('Optional request headers (string values only)'),
+    query: z
+        .record(z.string(), z.string())
+        .optional()
+        .describe('Optional query parameters to append to the URL'),
+    body: z
+        .union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())])
+        .optional()
+        .describe('Optional request body (string or JSON-serializable value)'),
+    timeoutMs: z
+        .int()
+        .positive()
+        .optional()
+        .default(30000)
+        .describe('Request timeout in milliseconds (default: 30000)'),
+});
 
 type HttpResponsePayload = {
     ok: boolean;

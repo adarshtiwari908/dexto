@@ -9,11 +9,9 @@ import { createLocalToolCallHeader, defineTool, truncateForHeader } from '@dexto
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 import type { ProcessServiceGetter } from './bash-exec-tool.js';
 
-const KillProcessInputSchema = z
-    .object({
-        process_id: z.string().describe('Process ID of the background process to terminate'),
-    })
-    .strict();
+const KillProcessInputSchema = z.strictObject({
+    process_id: z.string().describe('Process ID of the background process to terminate'),
+});
 
 /**
  * Create the kill_process internal tool

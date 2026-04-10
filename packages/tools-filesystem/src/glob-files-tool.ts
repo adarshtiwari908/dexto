@@ -12,24 +12,19 @@ import type { Tool, ToolExecutionContext } from '@dexto/core';
 import type { FileSystemServiceGetter } from './file-tool-types.js';
 import { createDirectoryAccessApprovalHandlers } from './directory-approval.js';
 
-const GlobFilesInputSchema = z
-    .object({
-        pattern: z
-            .string()
-            .describe('Glob pattern to match files (e.g., "**/*.ts", "src/**/*.js")'),
-        path: z
-            .string()
-            .optional()
-            .describe('Base directory to search from (defaults to working directory)'),
-        max_results: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(1000)
-            .describe('Maximum number of results to return (default: 1000)'),
-    })
-    .strict();
+const GlobFilesInputSchema = z.strictObject({
+    pattern: z.string().describe('Glob pattern to match files (e.g., "**/*.ts", "src/**/*.js")'),
+    path: z
+        .string()
+        .optional()
+        .describe('Base directory to search from (defaults to working directory)'),
+    max_results: z
+        .int()
+        .positive()
+        .optional()
+        .default(1000)
+        .describe('Maximum number of results to return (default: 1000)'),
+});
 
 /**
  * Create the glob_files internal tool with directory approval support

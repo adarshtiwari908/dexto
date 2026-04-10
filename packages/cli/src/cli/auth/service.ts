@@ -28,7 +28,7 @@ const AuthConfigSchema = z
         token: z.string().min(1).optional(),
         refreshToken: z.string().optional(),
         userId: z.string().optional(),
-        email: z.string().email().optional(),
+        email: z.email().optional(),
         expiresAt: z.number().optional(),
         createdAt: z.number(),
         dextoApiKey: z.string().optional(),
@@ -36,7 +36,7 @@ const AuthConfigSchema = z
         dextoApiKeySource: z.enum(['provisioned', 'user-supplied']).optional(),
     })
     .refine((data) => data.token || data.dextoApiKey, {
-        message: 'Either token (from OAuth) or dextoApiKey (from --api-key) is required',
+        error: 'Either token (from OAuth) or dextoApiKey (from --api-key) is required',
     });
 
 export async function storeAuth(config: AuthConfig): Promise<void> {

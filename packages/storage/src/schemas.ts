@@ -54,14 +54,13 @@ import { BlobStoreConfigSchema } from './blob/schemas.js';
  * shape required for config parsing and defaults.
  */
 export const StorageSchema = z
-    .object({
+    .strictObject({
         cache: CacheConfigSchema.describe('Cache configuration (fast, ephemeral)'),
         database: DatabaseConfigSchema.describe('Database configuration (persistent, reliable)'),
         blob: BlobStoreConfigSchema.describe(
             'Blob store configuration (for large, unstructured data)'
         ),
     })
-    .strict()
     .describe('Storage configuration with cache, database, and blob store')
     .brand<'ValidatedStorageConfig'>();
 

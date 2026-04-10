@@ -19,11 +19,11 @@
     "@dexto/storage": "workspace:*",
     "@dexto/tui": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.28.0",
-    "@opentelemetry/instrumentation-http": "^0.210.0",
-    "@opentelemetry/instrumentation-undici": "^0.20.0",
     "@opentelemetry/core": "^1.28.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.55.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.55.0",
+    "@opentelemetry/instrumentation-http": "^0.210.0",
+    "@opentelemetry/instrumentation-undici": "^0.20.0",
     "@opentelemetry/resources": "^1.28.0",
     "@opentelemetry/sdk-node": "^0.55.0",
     "@opentelemetry/sdk-trace-base": "^1.28.0",
@@ -44,7 +44,7 @@
     "tsx": "^4.19.2",
     "ws": "^8.18.1",
     "yaml": "^2.8.3",
-    "zod": "^3.25.0"
+    "zod": "^4.3.6"
   },
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 tsc -p tsconfig.json && pnpm run copy-agents && pnpm run copy-assets",

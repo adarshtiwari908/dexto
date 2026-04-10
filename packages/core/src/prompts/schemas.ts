@@ -15,7 +15,7 @@ import { PROMPT_NAME_REGEX, PROMPT_NAME_GUIDANCE } from './name-validation.js';
  * Schema for inline prompts - text defined directly in config
  */
 export const InlinePromptSchema = z
-    .object({
+    .strictObject({
         type: z.literal('inline').describe('Inline prompt type'),
         id: z
             .string()
@@ -76,14 +76,13 @@ export const InlinePromptSchema = z
             .optional()
             .describe('Agent ID from registry to use for fork execution (e.g., "explore-agent")'),
     })
-    .strict()
     .describe('Inline prompt with text defined directly in config');
 
 /**
  * Schema for file-based prompts - loaded from markdown files
  */
 export const FilePromptSchema = z
-    .object({
+    .strictObject({
         type: z.literal('file').describe('File-based prompt type'),
         file: z
             .string()
@@ -128,7 +127,6 @@ export const FilePromptSchema = z
             .optional()
             .describe('Plugin namespace for command prefixing (e.g., plugin-name:command)'),
     })
-    .strict()
     .describe('File-based prompt loaded from a markdown file');
 
 /**
@@ -144,7 +142,7 @@ export const PromptsSchema = z
             if (p.type === 'inline') {
                 if (seen.has(p.id)) {
                     ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
+                        code: 'custom',
                         message: `Duplicate prompt id: ${p.id}`,
                         path: [idx, 'id'],
                     });
@@ -163,7 +161,7 @@ export const PromptsSchema = z
             return p;
         })
     )
-    .default([])
+    .prefault([])
     .describe('Agent prompts - inline text or file-based');
 
 /**

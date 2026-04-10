@@ -3,24 +3,21 @@ import { createLocalToolCallHeader, defineTool, truncateForHeader } from '@dexto
 import type { Tool, ToolExecutionContext } from '@dexto/core';
 import { callExaTool } from './exa-mcp.js';
 
-const CodeSearchInputSchema = z
-    .object({
-        query: z
-            .string()
-            .min(1)
-            .describe(
-                "Search query for code examples and documentation (e.g., 'React useState examples', 'Express middleware', 'Python pandas dataframe filtering')"
-            ),
-        tokensNum: z
-            .number()
-            .int()
-            .min(1000)
-            .max(50000)
-            .optional()
-            .default(5000)
-            .describe('Approximate token budget to return (1000–50000, default: 5000)'),
-    })
-    .strict();
+const CodeSearchInputSchema = z.strictObject({
+    query: z
+        .string()
+        .min(1)
+        .describe(
+            "Search query for code examples and documentation (e.g., 'React useState examples', 'Express middleware', 'Python pandas dataframe filtering')"
+        ),
+    tokensNum: z
+        .int()
+        .min(1000)
+        .max(50000)
+        .optional()
+        .default(5000)
+        .describe('Approximate token budget to return (1000–50000, default: 5000)'),
+});
 /**
  * Create the `code_search` tool.
  *

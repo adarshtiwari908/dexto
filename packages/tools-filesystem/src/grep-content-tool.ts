@@ -12,40 +12,28 @@ import type { Tool, ToolExecutionContext } from '@dexto/core';
 import type { FileSystemServiceGetter } from './file-tool-types.js';
 import { createDirectoryAccessApprovalHandlers } from './directory-approval.js';
 
-const GrepContentInputSchema = z
-    .object({
-        pattern: z.string().describe('Regular expression pattern to search for'),
-        path: z
-            .string()
-            .optional()
-            .describe('Directory to search in (defaults to working directory)'),
-        glob: z
-            .string()
-            .optional()
-            .describe('Glob pattern to filter files (e.g., "*.ts", "**/*.js")'),
-        context_lines: z
-            .number()
-            .int()
-            .min(0)
-            .optional()
-            .default(0)
-            .describe(
-                'Number of context lines to include before and after each match (default: 0)'
-            ),
-        case_insensitive: z
-            .boolean()
-            .optional()
-            .default(false)
-            .describe('Perform case-insensitive search (default: false)'),
-        max_results: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .default(100)
-            .describe('Maximum number of results to return (default: 100)'),
-    })
-    .strict();
+const GrepContentInputSchema = z.strictObject({
+    pattern: z.string().describe('Regular expression pattern to search for'),
+    path: z.string().optional().describe('Directory to search in (defaults to working directory)'),
+    glob: z.string().optional().describe('Glob pattern to filter files (e.g., "*.ts", "**/*.js")'),
+    context_lines: z
+        .int()
+        .min(0)
+        .optional()
+        .default(0)
+        .describe('Number of context lines to include before and after each match (default: 0)'),
+    case_insensitive: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe('Perform case-insensitive search (default: false)'),
+    max_results: z
+        .int()
+        .positive()
+        .optional()
+        .default(100)
+        .describe('Maximum number of results to return (default: 100)'),
+});
 
 /**
  * Create the grep_content internal tool with directory approval support

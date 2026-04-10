@@ -11,7 +11,7 @@ import type { Tool, ToolExecutionContext } from '@dexto/core';
 import type { PlanServiceGetter } from '../plan-service-getter.js';
 import { PlanError } from '../errors.js';
 
-const PlanReadInputSchema = z.object({}).strict();
+const PlanReadInputSchema = z.strictObject({});
 
 /**
  * Creates the plan_read tool

@@ -92,24 +92,22 @@ const LLMConfigFields = {
 /** Business rules + compatibility checks */
 
 // Base LLM config object schema (before validation/branding) - can be extended
-export const LLMConfigBaseSchema = z
-    .object({
-        provider: LLMConfigFields.provider,
-        model: LLMConfigFields.model,
-        // apiKey is optional at schema level - validated based on provider in superRefine
-        apiKey: LLMConfigFields.apiKey,
-        maxIterations: LLMConfigFields.maxIterations
-            .optional()
-            .describe('Max outer-loop tool-call iterations per agent turn'),
-        baseURL: LLMConfigFields.baseURL,
-        maxInputTokens: LLMConfigFields.maxInputTokens,
-        maxOutputTokens: LLMConfigFields.maxOutputTokens,
-        temperature: LLMConfigFields.temperature,
-        allowedMediaTypes: LLMConfigFields.allowedMediaTypes,
-        // Provider-specific options
-        reasoning: LLMConfigFields.reasoning,
-    })
-    .strict();
+export const LLMConfigBaseSchema = z.strictObject({
+    provider: LLMConfigFields.provider,
+    model: LLMConfigFields.model,
+    // apiKey is optional at schema level - validated based on provider in superRefine
+    apiKey: LLMConfigFields.apiKey,
+    maxIterations: LLMConfigFields.maxIterations
+        .optional()
+        .describe('Max outer-loop tool-call iterations per agent turn'),
+    baseURL: LLMConfigFields.baseURL,
+    maxInputTokens: LLMConfigFields.maxInputTokens,
+    maxOutputTokens: LLMConfigFields.maxOutputTokens,
+    temperature: LLMConfigFields.temperature,
+    allowedMediaTypes: LLMConfigFields.allowedMediaTypes,
+    // Provider-specific options
+    reasoning: LLMConfigFields.reasoning,
+});
 
 /**
  * LLM config schema.
@@ -126,7 +124,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
     // This avoids implicit transformation and makes the config unambiguous.
     if (hasAllRegistryModelsSupport(data.provider) && !data.model.includes('/')) {
         ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             path: ['model'],
             message:
                 `Provider '${data.provider}' requires OpenRouter-format model IDs (e.g. ` +
@@ -142,7 +140,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
     if (baseURLIsSet) {
         if (!supportsBaseURL(data.provider)) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['provider'],
                 message:
                     `Provider '${data.provider}' does not support baseURL. ` +
@@ -163,7 +161,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
             const supportedModelsList = getSupportedModels(data.provider);
             if (!isValidProviderModel(data.provider, data.model)) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: ['model'],
                     message:
                         `Model '${data.model}' is not supported for provider '${data.provider}'. ` +
@@ -187,7 +185,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
                 const cap = getMaxInputTokensForModel(data.provider, data.model);
                 if (data.maxInputTokens! > cap) {
                     ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
+                        code: 'custom',
                         path: ['maxInputTokens'],
                         message:
                             `Max input tokens for model '${data.model}' is ${cap}. ` +
@@ -206,7 +204,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
                 ) {
                     // Model not found in registry
                     ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
+                        code: 'custom',
                         path: ['model'],
                         message: error.message,
                         params: {
@@ -220,7 +218,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
                     const message =
                         error instanceof Error ? error.message : 'Unknown error occurred';
                     ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
+                        code: 'custom',
                         path: ['model'],
                         message,
                         params: {
@@ -241,7 +239,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
 
         if (!supportsReasoningVariant(profile, variant)) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['reasoning', 'variant'],
                 message:
                     `Reasoning variant '${variant}' is not supported for provider '${data.provider}' ` +
@@ -256,7 +254,7 @@ export const LLMConfigSchema = LLMConfigBaseSchema.superRefine((data, ctx) => {
 
         if (typeof budgetTokens === 'number' && !profile.supportsBudgetTokens) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 path: ['reasoning', 'budgetTokens'],
                 message:
                     `Reasoning budgetTokens are not supported for provider '${data.provider}' ` +
@@ -291,7 +289,7 @@ export const LLMUpdatesSchema = z
         // Require at least one meaningful change field: model or provider
         if (!data.model && !data.provider) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 message: 'At least model or provider must be specified for LLM switch',
                 path: [],
             });
@@ -311,7 +309,7 @@ export const LLMUpdatesSchema = z
 
             if (!supportsReasoningVariant(profile, variant)) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: ['reasoning', 'variant'],
                     message:
                         `Reasoning variant '${variant}' is not supported for provider '${data.provider}' ` +
@@ -326,7 +324,7 @@ export const LLMUpdatesSchema = z
 
             if (typeof budgetTokens === 'number' && !profile.supportsBudgetTokens) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: ['reasoning', 'budgetTokens'],
                     message:
                         `Reasoning budgetTokens are not supported for provider '${data.provider}' ` +

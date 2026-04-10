@@ -30,95 +30,78 @@ import { z } from 'zod';
  * - prompt refresh so skills are immediately available
  * - scope-aware paths (workspace/global)
  */
-const SkillCreateInputSchema = z
-    .object({
-        id: z.string().min(1).describe('Skill id (kebab-case).'),
-        description: z.string().min(1).describe('Short description of what the skill does.'),
-        content: z.string().min(1).describe('Skill body (markdown) without frontmatter.'),
-        allowedTools: z
-            .array(z.string().min(1))
-            .optional()
-            .describe('Optional allowed-tools list for the skill frontmatter.'),
-        toolkits: z
-            .array(z.string().min(1))
-            .optional()
-            .describe('Optional toolkits list for the skill frontmatter.'),
-        scope: z.enum(['global', 'workspace']).optional(),
-        overwrite: z.boolean().optional(),
-    })
-    .strict();
+const SkillCreateInputSchema = z.strictObject({
+    id: z.string().min(1).describe('Skill id (kebab-case).'),
+    description: z.string().min(1).describe('Short description of what the skill does.'),
+    content: z.string().min(1).describe('Skill body (markdown) without frontmatter.'),
+    allowedTools: z
+        .array(z.string().min(1))
+        .optional()
+        .describe('Optional allowed-tools list for the skill frontmatter.'),
+    toolkits: z
+        .array(z.string().min(1))
+        .optional()
+        .describe('Optional toolkits list for the skill frontmatter.'),
+    scope: z.enum(['global', 'workspace']).optional(),
+    overwrite: z.boolean().optional(),
+});
 
-const SkillUpdateInputSchema = z
-    .object({
-        id: z.string().min(1),
-        content: z.string().min(1).describe('New SKILL.md body (markdown) without frontmatter.'),
-        description: z.string().min(1).optional(),
-        allowedTools: z
-            .array(z.string().min(1))
-            .optional()
-            .describe('Optional allowed-tools list for the skill frontmatter.'),
-        toolkits: z
-            .array(z.string().min(1))
-            .optional()
-            .describe('Optional toolkits list for the skill frontmatter.'),
-        scope: z.enum(['global', 'workspace']).optional(),
-    })
-    .strict();
+const SkillUpdateInputSchema = z.strictObject({
+    id: z.string().min(1),
+    content: z.string().min(1).describe('New SKILL.md body (markdown) without frontmatter.'),
+    description: z.string().min(1).optional(),
+    allowedTools: z
+        .array(z.string().min(1))
+        .optional()
+        .describe('Optional allowed-tools list for the skill frontmatter.'),
+    toolkits: z
+        .array(z.string().min(1))
+        .optional()
+        .describe('Optional toolkits list for the skill frontmatter.'),
+    scope: z.enum(['global', 'workspace']).optional(),
+});
 
-const SkillListInputSchema = z
-    .object({
-        projectPath: z.string().optional(),
-        query: z
-            .string()
-            .optional()
-            .describe('Optional search term to filter skills by name or path'),
-    })
-    .strict();
+const SkillListInputSchema = z.strictObject({
+    projectPath: z.string().optional(),
+    query: z.string().optional().describe('Optional search term to filter skills by name or path'),
+});
 
-const SkillRefreshInputSchema = z
-    .object({
-        id: z.string().min(1).describe('Skill id to refresh in the running agent session.'),
-        scope: z.enum(['global', 'workspace']).optional(),
-    })
-    .strict();
+const SkillRefreshInputSchema = z.strictObject({
+    id: z.string().min(1).describe('Skill id to refresh in the running agent session.'),
+    scope: z.enum(['global', 'workspace']).optional(),
+});
 
-const SkillSearchInputSchema = z
-    .object({
-        query: z
-            .string()
-            .optional()
-            .describe('Optional search term to filter skills by name or description'),
-        limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(200)
-            .optional()
-            .describe(
-                'Maximum number of skills to return. If omitted, all matches are returned for queries; otherwise defaults to 50.'
-            ),
-    })
-    .strict();
+const SkillSearchInputSchema = z.strictObject({
+    query: z
+        .string()
+        .optional()
+        .describe('Optional search term to filter skills by name or description'),
+    limit: z
+        .int()
+        .min(1)
+        .max(200)
+        .optional()
+        .describe(
+            'Maximum number of skills to return. If omitted, all matches are returned for queries; otherwise defaults to 50.'
+        ),
+});
 
-const ToolCatalogInputSchema = z
-    .object({
-        query: z
-            .string()
-            .optional()
-            .describe('Optional search term to filter tools by id or description'),
-        limit: z
-            .number()
-            .int()
-            .min(1)
-            .max(500)
-            .optional()
-            .describe('Maximum number of tools to return (defaults to all).'),
-        includeDescriptions: z
-            .boolean()
-            .optional()
-            .describe('Include tool descriptions (defaults to true).'),
-    })
-    .strict();
+const ToolCatalogInputSchema = z.strictObject({
+    query: z
+        .string()
+        .optional()
+        .describe('Optional search term to filter tools by id or description'),
+    limit: z
+        .int()
+        .min(1)
+        .max(500)
+        .optional()
+        .describe('Maximum number of tools to return (defaults to all).'),
+    includeDescriptions: z
+        .boolean()
+        .optional()
+        .describe('Include tool descriptions (defaults to true).'),
+});
 
 type SkillSearchEntry = {
     id: string;
