@@ -34,7 +34,7 @@ describe('zodToIssues', () => {
                 expect(issues).toHaveLength(1);
                 expect(issues[0]).toMatchObject({
                     code: 'schema_validation',
-                    message: 'Expected number, received string',
+                    message: 'Invalid input: expected number, received string',
                     path: ['age'],
                     severity: 'error',
                     scope: ErrorScope.AGENT,

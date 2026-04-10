@@ -7,7 +7,9 @@ import { ErrorScope, ErrorType } from '../errors/types.js';
 export const NonEmptyTrimmed = z
     .string()
     .transform((s) => s.trim())
-    .refine((s) => s.length > 0, { message: 'Required' });
+    .refine((s) => s.length > 0, {
+        error: 'Required',
+    });
 
 const ALLOWED_URL_PROTOCOLS = new Set(['http:', 'https:', 'codex:']);
 
@@ -24,7 +26,9 @@ function isValidUrl(s: string): boolean {
 export const OptionalURL = z
     .string()
     .transform((s) => s.trim())
-    .refine((s) => s === '' || isValidUrl(s), { message: 'Invalid URL' })
+    .refine((s) => s === '' || isValidUrl(s), {
+        error: 'Invalid URL',
+    })
     .transform((s) => (s === '' ? undefined : s))
     .optional();
 
@@ -44,7 +48,7 @@ export const EnvExpandedString = (env?: Record<string, string | undefined>) =>
 // Zod type for non-empty environment expanded string
 export const NonEmptyEnvExpandedString = (env?: Record<string, string | undefined>) =>
     EnvExpandedString(env).refine((s) => s.length > 0, {
-        message: 'Value is required',
+        error: 'Value is required',
     });
 
 // Zod type for URL that could be pulled from env variables
@@ -58,7 +62,9 @@ export const RequiredEnvURL = (env?: Record<string, string | undefined>) =>
                 return false;
             }
         },
-        { message: 'Invalid URL' }
+        {
+            error: 'Invalid URL',
+        }
     );
 
 /**
@@ -235,17 +241,44 @@ export function zodToIssues<C = unknown>(
 ): Issue<C>[] {
     const issues: Issue<C>[] = [];
 
-    for (const e of err.errors) {
-        // Handle invalid_union errors by extracting the actual validation errors from unionErrors
-        if (e.code === 'invalid_union' && (e as any).unionErrors) {
-            const unionErrors = (e as any).unionErrors as ZodError[];
+    for (const e of err.issues) {
+        // Handle invalid_union errors by extracting the actual validation errors
+        // Zod v4 uses 'errors' (array of arrays), Zod v3 used 'unionErrors' (array of ZodErrors)
+        const unionErrorsV4 = (e as any).errors as Array<z.ZodIssue[]> | undefined;
+        const unionErrorsV3 = (e as any).unionErrors as ZodError[] | undefined;
+
+        if (e.code === 'invalid_union' && (unionErrorsV4 || unionErrorsV3)) {
             // Iterate through ALL union errors to capture validation issues from every union branch
             let hasCollectedErrors = false;
-            for (const unionError of unionErrors) {
-                if (unionError && unionError.errors && unionError.errors.length > 0) {
-                    // Recursively process each union branch's errors
-                    issues.push(...zodToIssues<C>(unionError, severity));
-                    hasCollectedErrors = true;
+            const parentPath = e.path as (string | number)[];
+
+            if (unionErrorsV4) {
+                // Zod v4: errors is Array<Array<ZodIssue>>
+                for (const branchErrors of unionErrorsV4) {
+                    if (branchErrors && branchErrors.length > 0) {
+                        // Create a synthetic ZodError to reuse our recursive processing
+                        const syntheticError = new z.ZodError(branchErrors);
+                        const nestedIssues = zodToIssues<C>(syntheticError, severity);
+                        // Prepend parent path to nested issues
+                        for (const issue of nestedIssues) {
+                            issue.path = [...parentPath, ...(issue.path || [])];
+                        }
+                        issues.push(...nestedIssues);
+                        hasCollectedErrors = true;
+                    }
+                }
+            } else if (unionErrorsV3) {
+                // Zod v3: unionErrors is Array<ZodError>
+                for (const unionError of unionErrorsV3) {
+                    if (unionError && unionError.issues && unionError.issues.length > 0) {
+                        const nestedIssues = zodToIssues<C>(unionError, severity);
+                        // Prepend parent path to nested issues
+                        for (const issue of nestedIssues) {
+                            issue.path = [...parentPath, ...(issue.path || [])];
+                        }
+                        issues.push(...nestedIssues);
+                        hasCollectedErrors = true;
+                    }
                 }
             }
 
@@ -257,7 +290,7 @@ export function zodToIssues<C = unknown>(
                     message: e.message,
                     scope: params.scope ?? ErrorScope.AGENT,
                     type: params.type ?? ErrorType.USER,
-                    path: e.path,
+                    path: e.path as (string | number)[],
                     severity,
                     context: params as C,
                 });
@@ -270,7 +303,7 @@ export function zodToIssues<C = unknown>(
                 message: e.message,
                 scope: params.scope ?? ErrorScope.AGENT,
                 type: params.type ?? ErrorType.USER,
-                path: e.path,
+                path: e.path as (string | number)[],
                 severity,
                 context: params as C,
             });

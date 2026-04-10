@@ -20,7 +20,7 @@ describe('PermissionsConfigSchema', () => {
 
             const invalidResult = PermissionsConfigSchema.safeParse({ mode: 'invalid' });
             expect(invalidResult.success).toBe(false);
-            expect(invalidResult.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_enum_value);
+            expect(invalidResult.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_value);
             expect(invalidResult.error?.issues[0]?.path).toEqual(['mode']);
         });
 
@@ -63,7 +63,7 @@ describe('PermissionsConfigSchema', () => {
                 allowedToolsStorage: 'invalid',
             });
             expect(invalidResult.success).toBe(false);
-            expect(invalidResult.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_enum_value);
+            expect(invalidResult.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_value);
             expect(invalidResult.error?.issues[0]?.path).toEqual(['allowedToolsStorage']);
         });
     });
@@ -147,16 +147,16 @@ describe('PermissionsConfigSchema', () => {
         });
 
         it('should reject non-string mode values', () => {
-            // Number should fail
+            // Number should fail - Zod v4 reports enum mismatches as invalid_value
             let result = PermissionsConfigSchema.safeParse({ mode: 123 });
             expect(result.success).toBe(false);
-            expect(result.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_type);
+            expect(result.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_value);
             expect(result.error?.issues[0]?.path).toEqual(['mode']);
 
-            // Null should fail
+            // Null should fail - Zod v4 reports enum mismatches as invalid_value
             result = PermissionsConfigSchema.safeParse({ mode: null });
             expect(result.success).toBe(false);
-            expect(result.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_type);
+            expect(result.error?.issues[0]?.code).toBe(z.ZodIssueCode.invalid_value);
             expect(result.error?.issues[0]?.path).toEqual(['mode']);
         });
 
